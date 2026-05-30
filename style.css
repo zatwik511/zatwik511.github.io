@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
+
+html{
+  scroll-padding-top: 200px;
+}
+body {
+    background-color: #ff0000 ;
+    font-family: 'Google Sans';
+    margin: 0;
+    padding: 0;
+    padding-top: 80px;
+    
+}
+
+.hero-section {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+h1 {
+    font-weight: 800;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    
+  }
+
+#hero {
+  
+  text-align: center;
+    
+}
+
+
+.navbar {
+  
+  background-color: #000000;
+  color: rgb(255, 0, 0);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  
+}
+
+.nav-links {
+  display: flex;
+  margin-block: 35px;
+  justify-content: center;
+  gap: 300px;
+  width: 100%;
+  list-style: none;
+  
+}
+
+
+.nav-links a {
+
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1.5vw;
+  font-family: 'Google Sans';
+  
+}
+
+.nav-links a:hover {
+  color: #ff0000; /* Changes color when hovering */
+}
+
+.about-me{
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 100px;
+  margin: 100px;
+  margin-bottom: 300px;
+  
+
+  background-color: white;
+  text-align: center;
+}
+
+.projects
+{
+  display:flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 50px;
+  margin-bottom: 200px;
+  
+}
+
+.my-projects{
+  text-align: center;
+  display:flex;
+  flex-wrap: nowrap;
+  padding: 10px;
+  margin: 10px;
+  
+}
+
+.cards{
+  background-color:white;
+  padding: 10px;
+  margin: 10px;
+}
+
+.project-link{
+  color: red;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+
+
+
+.contact{
+  
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 100px;
+  margin: 200px;
+  margin-bottom: 150px;
+  
+
+  background-color: white;
+  font-weight: 700;
+
+}
+
+#myLinks{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+
+  font-weight: 500;
+  font-size: 25px;
+  
+}
+
+#myLinks a {
+    margin: 0; 
+    text-decoration: none;
+    color: red;
+  
+    text-align: center;
+}
