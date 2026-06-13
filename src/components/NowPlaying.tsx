@@ -11,6 +11,9 @@ export function NowPlaying({
   artist,
   albumArt,
   isPlaying = true,
+  trackUrl,
+  artistUrl,
+  albumUrl,
 }: NowPlayingData) {
   const clipRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLSpanElement>(null)
@@ -29,6 +32,29 @@ export function NowPlaying({
     if (text.scrollWidth > clip.clientWidth + 1) setScroll(true)
   }, [track, scroll])
 
+  const titleInner = scroll ? (
+    <span className="np-loop">
+      <span>{track}</span>
+      <span aria-hidden="true">{track}</span>
+    </span>
+  ) : (
+    <span ref={textRef}>{track}</span>
+  )
+
+  const artInner = (
+    <>
+      {albumArt && <img className="np-cover" src={albumArt} alt="" />}
+      <span className="np-scrim" aria-hidden="true" />
+      <span className={isPlaying ? 'eq' : 'eq eq-paused'} aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
+      <span className="np-tint" aria-hidden="true" />
+    </>
+  )
+
   return (
     <div className="np">
       <div className="np-info">
@@ -42,27 +68,47 @@ export function NowPlaying({
           {isPlaying ? 'PLAYING' : 'PLAYED'}
         </div>
         <div className="np-title" ref={clipRef}>
-          {scroll ? (
-            <div className="np-loop">
-              <span>{track}</span>
-              <span aria-hidden="true">{track}</span>
-            </div>
+          {trackUrl ? (
+            <a
+              className="np-link"
+              href={trackUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open "${track}" on Spotify`}
+            >
+              {titleInner}
+            </a>
           ) : (
-            <span ref={textRef}>{track}</span>
+            titleInner
           )}
         </div>
-        <div className="np-artist">{artist}</div>
+        {artistUrl ? (
+          <a
+            className="np-artist np-link"
+            href={artistUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${artist} on Spotify`}
+          >
+            {artist}
+          </a>
+        ) : (
+          <div className="np-artist">{artist}</div>
+        )}
       </div>
-      <div className="np-art">
-        {albumArt && <img className="np-cover" src={albumArt} alt="" />}
-        <span className="np-scrim" aria-hidden="true" />
-        <span className={isPlaying ? 'eq' : 'eq eq-paused'} aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-        </span>
-      </div>
+      {albumUrl ? (
+        <a
+          className="np-art"
+          href={albumUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open album on Spotify"
+        >
+          {artInner}
+        </a>
+      ) : (
+        <div className="np-art">{artInner}</div>
+      )}
     </div>
   )
 }

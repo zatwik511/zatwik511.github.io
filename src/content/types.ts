@@ -116,6 +116,10 @@ export interface NowPlaying {
   albumArt?: string
   /** Whether the track is currently playing (vs. most-recently played). */
   isPlaying?: boolean
+  /** Spotify links — make the title / artist / art clickable when present. */
+  trackUrl?: string
+  artistUrl?: string
+  albumUrl?: string
 }
 
 /** Everything the site needs to render. */

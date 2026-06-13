@@ -11,6 +11,9 @@ interface NowPlayingResponse {
   artist?: string
   albumArt?: string | null
   isPlaying?: boolean
+  trackUrl?: string | null
+  artistUrl?: string | null
+  albumUrl?: string | null
 }
 
 /**
@@ -33,6 +36,9 @@ export function useNowPlaying(): NowPlaying | null {
             artist: d.artist ?? '',
             albumArt: d.albumArt ?? undefined,
             isPlaying: Boolean(d.isPlaying),
+            trackUrl: d.trackUrl ?? undefined,
+            artistUrl: d.artistUrl ?? undefined,
+            albumUrl: d.albumUrl ?? undefined,
           })
         }
       } catch {

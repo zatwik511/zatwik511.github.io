@@ -29,6 +29,9 @@ interface Track {
   track: string
   artist: string
   albumArt: string | null
+  trackUrl: string | null
+  artistUrl: string | null
+  albumUrl: string | null
   isPlaying: boolean
 }
 
@@ -68,14 +71,21 @@ async function getAccessToken(): Promise<string | null> {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function toTrack(item: any, isPlaying: boolean): Track | null {
   if (!item) return null
-  const artists = Array.isArray(item.artists)
-    ? item.artists.map((a: any) => a.name).join(', ')
+  const artistList = Array.isArray(item.artists) ? item.artists : []
+  const artists = artistList.length
+    ? artistList.map((a: any) => a.name).join(', ')
     : (item.show?.name ?? '') // podcast episodes
   const images = item.album?.images ?? item.images ?? []
   return {
     track: item.name ?? '',
     artist: artists,
     albumArt: images[0]?.url ?? null,
+    trackUrl: item.external_urls?.spotify ?? null,
+    artistUrl:
+      artistList[0]?.external_urls?.spotify ??
+      item.show?.external_urls?.spotify ??
+      null,
+    albumUrl: item.album?.external_urls?.spotify ?? null,
     isPlaying,
   }
 }
