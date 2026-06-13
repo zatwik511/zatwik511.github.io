@@ -11,6 +11,14 @@ dist
 dist-ssr
 *.local
 
+# Local env files (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel
+
 # TypeScript incremental build cache
 *.tsbuildinfo
 

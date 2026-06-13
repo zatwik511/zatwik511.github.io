@@ -1,7 +1,12 @@
 :root {
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-    sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  /* Display (hero headers — the "spaceship hull"). */
+  --display: 'Orbitron', var(--sans);
+  /* Body copy (the "system logs"). */
+  --sans: 'Roboto Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+  /* HUD / telemetry / code (the "terminal"). */
+  --mono: 'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,
+    'Liberation Mono', monospace;
 
   /* Red is the hull, not an accent. Deepened red reads more premium than #f00. */
   --red: #cf2424;
@@ -36,6 +41,38 @@ body {
   font-family: var(--sans);
   /* Avoid the page itself scrolling — each panel scrolls independently. */
   overflow: hidden;
+  /* Space-travel cursor: a HUD targeting reticle (hotspot at its centre). */
+  cursor: url('/cursor-reticle.svg') 14 16, auto;
+}
+
+/* "Target locked" bracket cursor on anything clickable. */
+a,
+button,
+[role='link'],
+[role='button'] {
+  cursor: url('/cursor-lock.svg') 16 16, pointer;
+}
+
+/* Over the cockpit (red hull), the cursor dot + ring turn black. */
+.cockpit {
+  cursor: url('/cursor-reticle-dark.svg') 14 16, auto;
+}
+
+.cockpit a,
+.cockpit button,
+.cockpit [role='link'],
+.cockpit [role='button'] {
+  cursor: url('/cursor-lock-dark.svg') 16 16, pointer;
+}
+
+/* Full-viewport canvas for the cursor trail; never intercepts input. */
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 button {
@@ -53,7 +90,7 @@ button {
 /* PC (landscape): windshield ~60% left, cockpit ~40% right, vertical seam. */
 .windshield {
   position: relative;
-  flex: 1.55;
+  flex: 1;
   min-width: 0;
   background: var(--sky);
   display: flex;
@@ -67,6 +104,10 @@ button {
   border-left: 2px solid var(--red-line);
   overflow-y: auto;
   padding: clamp(16px, 2.4vw, 28px);
+  /* Stack header/tagline above three equal-height nav rows that fill the panel. */
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 /* Phone (portrait): windshield on top, cockpit below, horizontal seam. */
@@ -75,7 +116,7 @@ button {
     flex-direction: column;
   }
   .windshield {
-    flex: 1.1;
+    flex: 1;
   }
   .cockpit {
     flex: 1;
@@ -88,7 +129,7 @@ button {
 
 .ml {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 1.5px;
 }
 
@@ -137,7 +178,7 @@ button {
   right: 12px;
   z-index: 2;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.5px;
   color: var(--red);
   background: #fff;
@@ -167,28 +208,31 @@ button {
 }
 
 .ws-head {
-  font-size: 16px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 42px;
+  letter-spacing: 0.5px;
   color: #fff;
   margin-top: 8px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .ws-meta {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--mut);
   margin-top: 6px;
   line-height: 1.6;
 }
 
 .ws-body {
-  font-size: 13px;
+  font-size: 16px;
   color: #c4c4c9;
   margin-top: 10px;
   line-height: 1.7;
 }
 
 .ws-summary {
-  font-size: 13px;
+  font-size: 16px;
   color: #cfcfd4;
   margin: 8px 0 10px;
   line-height: 1.6;
@@ -212,7 +256,7 @@ button {
   justify-content: center;
   color: #ff7a7a;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   padding: 8px;
 }
@@ -226,7 +270,7 @@ button {
 
 .tech-tag {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--red-soft);
   border: 1px solid var(--seam);
   border-radius: 999px;
@@ -236,7 +280,7 @@ button {
 .openlnk {
   color: #ff9a9a;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 15px;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
@@ -261,7 +305,7 @@ button {
 }
 
 .np-track {
-  font-size: 12px;
+  font-size: 15px;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -287,21 +331,120 @@ button {
 
 .cp-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
+.cp-socials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* Name flanked by two right-angle triangles (email popup / CV download). */
+.cp-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 26px);
+}
+
+.cp-flank {
+  display: inline-flex;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.flank-tri {
+  width: clamp(40px, 6vw, 58px);
+  height: clamp(40px, 6vw, 58px);
+  display: block;
+}
+
+.flank-tri polygon {
+  transition:
+    fill 0.2s ease,
+    stroke 0.2s ease;
+}
+
+.cp-flank:hover {
+  transform: translateY(-2px);
+}
+
+.cp-flank:hover .flank-tri polygon {
+  fill: rgba(255, 255, 255, 0.16);
+}
+
+.cp-flank:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* The name is a button styled like the nav buttons: a red rectangle with a
+   white outline and white text, inverting to white/red when it is the active
+   view (the welcome screen). */
 .cp-name {
-  font-size: 19px;
-  font-weight: 500;
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
   color: #fff;
+  background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+  border: 2px solid #fff;
+  border-radius: 0;
+  padding: 8px 22px;
+  cursor: pointer;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.cp-name:not(.on):hover {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, #e23a3a 0%, var(--red) 100%);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.45),
+    0 0 0 2px rgba(255, 255, 255, 0.65),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.cp-name:active {
+  transform: translateY(-1px);
+}
+
+.cp-name:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Active (welcome screen showing): inverted to white with red text. */
+.cp-name.on {
+  background: linear-gradient(180deg, #ffffff 0%, #f2f2f4 100%);
+  color: var(--red);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(207, 36, 36, 0.18);
 }
 
 .iclink {
   color: #fff;
   display: inline-flex;
   line-height: 0;
+  /* Works as both <a> and <button>. */
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .iclink:hover {
@@ -314,50 +457,271 @@ button {
   border-radius: 4px;
 }
 
-.cp-tagline {
+/* Icon + hover tooltip wrapper. */
+.social {
+  position: relative;
+  display: inline-flex;
+}
+
+.social-hint {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  white-space: nowrap;
+  font-family: var(--mono);
   font-size: 12px;
+  color: var(--red);
+  background: #fff;
+  border: 1px solid #fff;
+  padding: 3px 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  z-index: 3;
+}
+
+/* Reveal on hover or keyboard focus. */
+.social:hover .social-hint,
+.social:focus-within .social-hint {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.cp-tagline {
+  font-size: 15px;
   color: var(--red-soft);
-  margin: 4px 0 14px;
+  margin: 6px 0 18px;
   line-height: 1.5;
+  text-align: center;
+}
+
+/* One big hollow white frame around all three sections. */
+.nav-deck {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border: 2px solid #fff;
+  padding: 18px;
 }
 
 .nav-group {
-  margin-bottom: 12px;
+  /* Each section takes an equal share of the leftover height. */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* White heading bar: prev triangle · name · next triangle. */
+.nav-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 2px solid #fff;
+  padding: 2px 8px;
 }
 
 .nav-group-heading {
-  color: var(--red-soft);
-  display: block;
-  margin-bottom: 7px;
+  flex: 0 0 auto;
+  text-align: center;
+  color: var(--red);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* Triangle pager buttons. Each takes half the leftover space and centres its
+   triangle, so the triangles sit roughly halfway between the edge and name. */
+.nav-pager {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.nav-pager[disabled] {
+  opacity: 0.22;
+  cursor: default;
+}
+
+/* Solid red triangles drawn with borders. Base (vertical, 16px) ==
+   perpendicular (horizontal, 16px), so they read as right-isosceles. */
+.tri {
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.tri-left {
+  border-right: 16px solid var(--red);
+}
+
+.tri-right {
+  border-left: 16px solid var(--red);
+}
+
+.nav-pager:not([disabled]):hover .tri-left {
+  border-right-color: var(--red-deep);
+}
+
+.nav-pager:not([disabled]):hover .tri-right {
+  border-left-color: var(--red-deep);
+}
+
+/* Sci-fi "warp in" when paging the nav: cards streak in from the swipe
+   direction, flash bright, and wipe open top-to-bottom, staggered. */
+@media (prefers-reduced-motion: no-preference) {
+  .nav-items .navitem {
+    animation: card-warp 0.45s cubic-bezier(0.2, 0.75, 0.2, 1) backwards;
+  }
+  .nav-items.dir-next .navitem {
+    --warp-x: 48px;
+  }
+  .nav-items.dir-prev .navitem {
+    --warp-x: -48px;
+  }
+  .nav-items .navitem:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  .nav-items .navitem:nth-child(3) {
+    animation-delay: 0.16s;
+  }
+}
+
+@keyframes card-warp {
+  0% {
+    opacity: 0;
+    transform: translateX(var(--warp-x, 40px)) skewX(-7deg) scale(0.96);
+    filter: brightness(2.4);
+    clip-path: inset(0 0 100% 0);
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(1.4);
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) skewX(0) scale(1);
+    filter: brightness(1);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Buttons laid out as a row of 3 per section, filling the section height. */
+.nav-items {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .navitem {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: var(--red-deep);
-  border: 1px solid #e86a6a;
-  border-radius: 7px;
-  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  min-height: 64px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+  border: 2px solid #fff;
+  border-radius: 0;
+  padding: 12px 14px;
   color: #fff;
   cursor: pointer;
+  /* Same font as the section names (mono), but lowercase. */
+  font-family: var(--mono);
+  text-transform: lowercase;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  line-height: 1.25;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Title line on the button. */
+.navitem-title {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+/* One-line description under the title. */
+.navitem-blurb {
+  font-family: var(--sans);
   font-size: 13px;
-  margin-bottom: 6px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.25;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.navitem.on .navitem-blurb {
+  color: rgba(207, 36, 36, 0.8);
 }
 
 .navitem:hover {
-  border-color: #fff;
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, #e23a3a 0%, var(--red) 100%);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.45),
+    0 0 0 2px rgba(255, 255, 255, 0.65),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.navitem:active {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 .navitem:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 1px;
+  outline: 3px solid #fff;
+  outline-offset: 2px;
 }
 
-/* Selected state without shifting layout (compensate the thicker border). */
+/* Selected state inverts to white with red text. */
 .navitem.on {
-  border: 2px solid #fff;
-  padding: 6px 9px;
+  background: linear-gradient(180deg, #ffffff 0%, #f2f2f4 100%);
+  color: var(--red);
+  border-color: #fff;
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(207, 36, 36, 0.18);
+}
+
+/* On the narrow phone layout, two per row keeps labels readable. */
+@media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
+  .nav-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ---- Motion: everything pauses for reduced-motion -------------------- */
@@ -409,5 +773,159 @@ button {
   }
   50% {
     transform: scale(1.06);
+  }
+}
+
+/* ---- Email popup (cockpit-themed modal) ------------------------------ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(7, 7, 10, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  width: min(460px, 100%);
+  background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+  border: 2px solid #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  padding: 22px;
+  color: #fff;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.modal-close:hover {
+  color: var(--red-soft);
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-label {
+  color: var(--red-soft);
+}
+
+.modal-input {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid #fff;
+  padding: 10px 12px;
+  outline: none;
+  cursor: text;
+}
+
+.modal-input:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.modal-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.modal-send {
+  align-self: flex-end;
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: 1px;
+  background: #fff;
+  color: var(--red);
+  border: 2px solid #fff;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.modal-send:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.modal-send:disabled,
+.modal-input:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Honeypot field: visually hidden, off the tab order, but present for bots. */
+.modal-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-status {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.modal-status-ok {
+  color: #fff;
+}
+
+.modal-status-err {
+  color: #ffd6d6;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal {
+    animation: modal-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { profile, getEntry, type EntryId } from './content'
 import { Windshield } from './components/Windshield'
 import { Cockpit } from './components/Cockpit'
+import { CursorTrail } from './components/CursorTrail'
 
 export function App() {
   const [selectedId, setSelectedId] = useState<EntryId | null>(null)
@@ -18,13 +19,19 @@ export function App() {
 
   return (
     <main className="deck">
+      <CursorTrail />
       <Windshield
         skills={profile.skills}
         nowPlaying={profile.nowPlaying}
         selected={selected}
         onLaunch={handleLaunch}
       />
-      <Cockpit profile={profile} selectedId={selectedId} onSelect={setSelectedId} />
+      <Cockpit
+        profile={profile}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        onHome={() => setSelectedId(null)}
+      />
     </main>
   )
 }

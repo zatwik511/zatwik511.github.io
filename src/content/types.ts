@@ -14,12 +14,23 @@ export type EntryKind = 'education' | 'experience' | 'project'
 /** A stable identifier; also used in the URL/3D scene-graph node name. */
 export type EntryId = string
 
+/** What happens when a social link is activated. */
+export type SocialAction =
+  /** Open a URL in a new tab (GitHub, LinkedIn). */
+  | { kind: 'link'; url: string }
+  /** Start an email to this address (mailto:). */
+  | { kind: 'mailto'; address: string }
+  /** Copy this value to the clipboard (phone number). */
+  | { kind: 'copy'; value: string }
+
 export interface SocialLink {
   /** Accessible label, e.g. "GitHub". */
   label: string
-  url: string
-  /** Which brand icon to render. Extend as more links move into a mode. */
-  icon: 'github' | 'linkedin'
+  /** Which icon to render. Extend as more links move into a mode. */
+  icon: 'github' | 'linkedin' | 'phone' | 'email'
+  /** Shown in the tooltip on hover (username, number, or address). */
+  hint: string
+  action: SocialAction
 }
 
 /**
@@ -39,6 +50,8 @@ interface EntryBase {
   kind: EntryKind
   /** Short label for the cockpit nav button. */
   navLabel: string
+  /** One-line description shown under the title on the nav button. */
+  navBlurb: string
   /** Monospace HUD micro-label shown atop the windshield panel. */
   hudLabel: string
   universe?: UniversePlacement
@@ -105,6 +118,10 @@ export interface NowPlaying {
 export interface Profile {
   name: string
   tagline: string
+  /** Path to the downloadable CV PDF (lives in public/). */
+  cvUrl: string
+  /** Direct contact address for the email popup. */
+  contactEmail: string
   socials: SocialLink[]
   /** Drives the windshield skills ticker. */
   skills: string[]
