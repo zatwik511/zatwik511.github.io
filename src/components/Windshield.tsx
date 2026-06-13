@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import type { Entry, NowPlaying as NowPlayingData } from '../content'
-import { Starfield } from './Starfield'
 import { SkillsTicker } from './SkillsTicker'
 import { LaunchButton } from './LaunchButton'
 import { NowPlaying } from './NowPlaying'
@@ -32,7 +31,6 @@ export function Windshield({
 
   return (
     <section className="windshield" aria-label="Flight deck display">
-      <Starfield />
       <SkillsTicker skills={skills} />
       <NowPlaying {...nowPlaying} />
 

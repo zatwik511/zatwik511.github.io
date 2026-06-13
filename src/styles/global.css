@@ -94,7 +94,8 @@ button {
   position: relative;
   flex: 1;
   min-width: 0;
-  background: var(--sky);
+  /* Real night-sky photo (shot by Satwik); near-black so the red hull pops. */
+  background: var(--sky) url('/starfield.jpg') center / cover no-repeat;
   display: flex;
   flex-direction: column;
 }

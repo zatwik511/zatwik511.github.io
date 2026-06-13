@@ -33,3 +33,6 @@ dist-ssr
 *.sln
 *.sw?
 Thumbs.db
+
+# Large source image (optimized copy lives in public/starfield.jpg)
+/BACKGROUND.jpg
