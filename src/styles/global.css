@@ -94,10 +94,24 @@ button {
   position: relative;
   flex: 1;
   min-width: 0;
-  /* Real night-sky photo (shot by Satwik); near-black so the red hull pops. */
-  background: var(--sky) url('/starfield.jpg') center / cover no-repeat;
   display: flex;
   flex-direction: column;
+  /* Real night-sky photo (shot by Satwik). AVIF for clean dark gradients with
+     a JPEG fallback; a left-weighted dark wash boosts text contrast and keeps
+     the blacks deep so the red hull pops. */
+  background-color: var(--sky);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.4) 42%, rgba(0, 0, 0, 0.18) 100%),
+    url('/starfield.jpg');
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.4) 42%, rgba(0, 0, 0, 0.18) 100%),
+    -webkit-image-set(url('/starfield.avif') type('image/avif'), url('/starfield.jpg') type('image/jpeg'));
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.4) 42%, rgba(0, 0, 0, 0.18) 100%),
+    image-set(url('/starfield.avif') type('image/avif'), url('/starfield.jpg') type('image/jpeg'));
 }
 
 .cockpit {
