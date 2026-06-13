@@ -34,13 +34,17 @@ export function Windshield({
     <section className="windshield" aria-label="Flight deck display">
       <Starfield />
       <SkillsTicker skills={skills} />
-      <LaunchButton onLaunch={onLaunch} />
+      <NowPlaying {...nowPlaying} />
 
       <div className="ws-scroll" ref={scrollRef} aria-live="polite">
+        {/* reserves the top-right corner so headings wrap before the widget */}
+        <div className="ws-widget-spacer" aria-hidden="true" />
         <EntryContent entry={selected} />
       </div>
 
-      <NowPlaying {...nowPlaying} />
+      <div className="ws-launch-bar">
+        <LaunchButton onLaunch={onLaunch} />
+      </div>
     </section>
   )
 }

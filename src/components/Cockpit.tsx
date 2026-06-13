@@ -7,6 +7,7 @@ import {
 } from '@tabler/icons-react'
 import type { EntryId, NavGroup, Profile, SocialLink } from '../content'
 import { EmailModal } from './EmailModal'
+import { HullDecor } from './HullDecor'
 
 const ICONS = {
   github: IconBrandGithub,
@@ -103,6 +104,11 @@ function NavSection({ group, selectedId, onSelect }: NavSectionProps) {
     setPage((p) => p + delta)
   }
 
+  const goTo = (i: number) => {
+    setDir(i > current ? 'next' : 'prev')
+    setPage(i)
+  }
+
   return (
     <div className="nav-group">
       <div className="nav-head">
@@ -142,6 +148,20 @@ function NavSection({ group, selectedId, onSelect }: NavSectionProps) {
           )
         })}
       </div>
+      {pageCount > 1 && (
+        <div className="nav-dots" aria-label={`${group.heading} pages`}>
+          {Array.from({ length: pageCount }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={i === current ? 'nav-dot on' : 'nav-dot'}
+              aria-label={`${group.heading} page ${i + 1} of ${pageCount}`}
+              aria-current={i === current}
+              onClick={() => goTo(i)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -156,22 +176,35 @@ export function Cockpit({ profile, selectedId, onSelect, onHome }: CockpitProps)
 
   return (
     <nav className="cockpit" aria-label="Cockpit controls">
+      <HullDecor />
       <div className="cp-header">
         <div className="cp-name-row">
           <button
             type="button"
-            className="cp-flank"
+            className="cp-flank cp-flank-left"
             aria-label="Send me a message"
             onClick={() => setEmailOpen(true)}
           >
-            <svg className="flank-tri" viewBox="0 0 60 60" aria-hidden="true">
+            <svg className="flank-tri" viewBox="0 0 96 114" aria-hidden="true">
+              {/* triangle + label box as one clean outline */}
               <polygon
-                points="52,8 52,52 8,52"
-                fill="none"
+                points="88,4 88,108 8,108 8,84"
+                fill="var(--red)"
                 stroke="#fff"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 strokeLinejoin="round"
               />
+              {/* divider between triangle and label box */}
+              <line x1="8" y1="84" x2="88" y2="84" stroke="#fff" strokeWidth="2.5" />
+              <text
+                x="48"
+                y="96"
+                className="flank-word"
+                textAnchor="middle"
+                dominantBaseline="central"
+              >
+                MESSAGE
+              </text>
             </svg>
           </button>
 
@@ -186,19 +219,31 @@ export function Cockpit({ profile, selectedId, onSelect, onHome }: CockpitProps)
           </button>
 
           <a
-            className="cp-flank"
+            className="cp-flank cp-flank-right"
             href={profile.cvUrl}
             download
             aria-label="Download my CV (PDF)"
           >
-            <svg className="flank-tri" viewBox="0 0 60 60" aria-hidden="true">
+            <svg className="flank-tri" viewBox="0 0 96 114" aria-hidden="true">
+              {/* label box + triangle as one clean outline */}
               <polygon
-                points="8,52 8,8 52,8"
-                fill="none"
+                points="8,6 88,6 88,30 8,110"
+                fill="var(--red)"
                 stroke="#fff"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 strokeLinejoin="round"
               />
+              {/* divider between label box and triangle */}
+              <line x1="8" y1="30" x2="88" y2="30" stroke="#fff" strokeWidth="2.5" />
+              <text
+                x="48"
+                y="18"
+                className="flank-word"
+                textAnchor="middle"
+                dominantBaseline="central"
+              >
+                CV
+              </text>
             </svg>
           </a>
         </div>

@@ -11,7 +11,7 @@ export function SkillsTicker({ skills }: { skills: string[] }) {
         {run.map((skill, i) => (
           <span key={i}>
             {skill}
-            <b> // </b>
+            <b> ◀ </b>
           </span>
         ))}
       </div>

@@ -3,6 +3,7 @@ import { profile, getEntry, type EntryId } from './content'
 import { Windshield } from './components/Windshield'
 import { Cockpit } from './components/Cockpit'
 import { CursorTrail } from './components/CursorTrail'
+import { useNowPlaying } from './hooks/useNowPlaying'
 
 export function App() {
   const [selectedId, setSelectedId] = useState<EntryId | null>(null)
@@ -10,6 +11,10 @@ export function App() {
     () => (selectedId ? getEntry(selectedId) ?? null : null),
     [selectedId],
   )
+
+  // Live Spotify track (falls back to the static profile track until/if it loads).
+  const livePlaying = useNowPlaying()
+  const nowPlaying = livePlaying ?? profile.nowPlaying
 
   // Phase 3 will route this into the 3D ride. Until then it's a no-op
   // affordance so the cockpit stays self-contained.
@@ -22,7 +27,7 @@ export function App() {
       <CursorTrail />
       <Windshield
         skills={profile.skills}
-        nowPlaying={profile.nowPlaying}
+        nowPlaying={nowPlaying}
         selected={selected}
         onLaunch={handleLaunch}
       />

@@ -7,6 +7,8 @@
   /* HUD / telemetry / code (the "terminal"). */
   --mono: 'Share Tech Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,
     'Liberation Mono', monospace;
+  /* Display face — used only for the now-playing track/artist. */
+  --np-font: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
 
   /* Red is the hull, not an accent. Deepened red reads more premium than #f00. */
   --red: #cf2424;
@@ -98,6 +100,7 @@ button {
 }
 
 .cockpit {
+  position: relative;
   flex: 1;
   min-width: 0;
   background: var(--red);
@@ -108,6 +111,55 @@ button {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+/* Decorative hull line-art layers (behind the content). */
+.hull-decor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  fill: none;
+  stroke-width: 1.4;
+}
+
+/* Dim base — always visible. */
+.hull-decor-base {
+  stroke: rgba(255, 255, 255, 0.32);
+}
+
+/* Bright glow layer — only the thin lines, revealed in a soft circle that
+   follows the cursor (--mx/--my set in JS). Off-screen by default. */
+.hull-decor-glow {
+  stroke: #fff;
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
+  -webkit-mask-image: radial-gradient(
+    circle 76px at var(--mx, -9999px) var(--my, -9999px),
+    #000 0%,
+    #000 38%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle 76px at var(--mx, -9999px) var(--my, -9999px),
+    #000 0%,
+    #000 38%,
+    transparent 100%
+  );
+}
+
+/* Only the thin lines glow; nodes and greeble squares stay dim (base only). */
+.hull-decor-glow circle,
+.hull-decor-glow rect {
+  display: none;
+}
+
+/* Keep the interactive content above the decor. */
+.cp-header,
+.nav-deck {
+  position: relative;
+  z-index: 1;
 }
 
 /* Phone (portrait): windshield on top, cockpit below, horizontal seam. */
@@ -166,17 +218,27 @@ button {
 }
 
 .tick-track b {
-  color: var(--red-line);
+  color: var(--red);
   font-weight: 400;
+  font-size: 22px;
+  line-height: 0;
+  vertical-align: middle;
 }
 
 /* ---- Windshield: launch button --------------------------------------- */
 
+/* Launch button now lives centered in a bottom bar. */
+.ws-launch-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--seam);
+}
+
 .launch {
-  position: absolute;
-  top: 44px;
-  right: 12px;
-  z-index: 2;
   font-family: var(--mono);
   font-size: 14px;
   letter-spacing: 0.5px;
@@ -184,7 +246,7 @@ button {
   background: #fff;
   border: none;
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   cursor: pointer;
 }
 
@@ -201,6 +263,14 @@ button {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
+}
+
+/* Invisible float reserving the top-right corner, so content text wraps
+   (breaks) before it reaches the now-playing widget instead of sliding under. */
+.ws-widget-spacer {
+  float: right;
+  width: min(332px, 60%);
+  height: 92px;
 }
 
 .ws-hud {
@@ -293,38 +363,159 @@ button {
 
 /* ---- Windshield: now playing ----------------------------------------- */
 
+/* Now-playing is a widget pinned to the top-right corner. */
 .np {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  z-index: 2;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-top: 1px solid var(--seam);
-  padding: 9px 14px;
+  gap: 13px;
+  max-width: 320px;
+  padding: 16px 16px 13px;
+  /* Transparent glass by default; the red tint pops on hover. */
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--seam);
+  border-radius: 0;
+  backdrop-filter: blur(4px) saturate(1.1);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.np:hover {
+  background: rgba(95, 18, 18, 0.55);
+  border-color: var(--red);
+}
+
+.np-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.np-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: var(--spotify);
+}
+
+.np-spot {
   flex-shrink: 0;
 }
 
-.np-track {
-  font-size: 15px;
+/* Song title — clips, and scrolls only when it overflows (see .np-marquee). */
+.np-title {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.np-title span {
+  font-family: var(--np-font);
+  font-size: 22px;
+  letter-spacing: 0.5px;
   color: #fff;
+}
+
+.np-title > span {
+  display: inline-block;
+}
+
+/* Seamless looping marquee (two copies) when the title overflows. */
+.np-loop {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.np-loop span {
+  flex: none;
+  padding-right: 2.5em;
+}
+
+.np-artist {
+  font-family: var(--np-font);
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: var(--mut);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .np-loop {
+    animation: np-loop-scroll 7s linear infinite;
+  }
+}
+
+@keyframes np-loop-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 .eq {
   display: inline-flex;
   align-items: flex-end;
-  gap: 2px;
-  height: 13px;
+  gap: 2.5px;
+  height: 17px;
 }
 
 .eq i {
-  width: 3px;
-  height: 13px;
+  width: 4px;
+  height: 17px;
   background: var(--spotify);
   transform-origin: bottom;
   transform: scaleY(0.3);
+}
+
+/* Album art square with the equaliser overlaid on top of it. */
+.np-art {
+  position: relative;
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  /* placeholder look until a real cover URL is set */
+  background: linear-gradient(135deg, #1db954 0%, #0c3d24 55%, #07070a 100%);
+}
+
+.np-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Darkens the lower area so the green bars stay readable over any cover. */
+.np-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 65%);
+}
+
+.np-art .eq {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+}
+
+/* When not playing, freeze the bars at a low resting height. */
+.eq.eq-paused i {
+  animation: none;
+  transform: scaleY(0.25);
 }
 
 /* ---- Cockpit: header + nav ------------------------------------------- */
@@ -348,11 +539,14 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(10px, 2vw, 26px);
+  gap: clamp(14px, 3vw, 44px);
 }
 
 .cp-flank {
+  position: relative;
   display: inline-flex;
+  width: clamp(104px, 10vw, 128px);
+  height: clamp(124px, 12vw, 152px);
   background: none;
   border: none;
   padding: 0;
@@ -361,23 +555,43 @@ button {
 }
 
 .flank-tri {
-  width: clamp(40px, 6vw, 58px);
-  height: clamp(40px, 6vw, 58px);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   display: block;
 }
 
-.flank-tri polygon {
-  transition:
-    fill 0.2s ease,
-    stroke 0.2s ease;
+/* Word sitting inside the label box. */
+.flank-word {
+  fill: #fff;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.flank-tri polygon,
+.flank-tri rect,
+.flank-word {
+  transition: fill 0.2s ease;
 }
 
 .cp-flank:hover {
   transform: translateY(-2px);
 }
 
-.cp-flank:hover .flank-tri polygon {
-  fill: rgba(255, 255, 255, 0.16);
+/* Invert on hover/focus: solid white shapes, red label. */
+.cp-flank:hover .flank-tri polygon,
+.cp-flank:hover .flank-tri rect,
+.cp-flank:focus-visible .flank-tri polygon,
+.cp-flank:focus-visible .flank-tri rect {
+  fill: #fff;
+}
+
+.cp-flank:hover .flank-word,
+.cp-flank:focus-visible .flank-word {
+  fill: var(--red);
 }
 
 .cp-flank:focus-visible {
@@ -385,20 +599,32 @@ button {
   outline-offset: 3px;
 }
 
+/* Nudge each flank vertically so the inner (perpendicular) edges line up at
+   the same height as the name box. Increase to push further:
+   left -> larger `top` lowers it; right -> more-negative `top` raises it. */
+.cp-flank-left {
+  top: 16px;
+}
+
+.cp-flank-right {
+  top: -16px;
+}
+
 /* The name is a button styled like the nav buttons: a red rectangle with a
    white outline and white text, inverting to white/red when it is the active
    view (the welcome screen). */
 .cp-name {
   font-family: var(--display);
-  font-size: 36px;
+  font-size: clamp(32px, 3.9vw, 42px);
   font-weight: 700;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
   text-align: center;
   color: #fff;
   background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
   border: 2px solid #fff;
   border-radius: 0;
-  padding: 8px 22px;
+  padding: 11px 32px;
   cursor: pointer;
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.3),
@@ -507,6 +733,8 @@ button {
   gap: 18px;
   border: 2px solid #fff;
   padding: 18px;
+  /* Opaque so the hull line-art stays outside this rectangle. */
+  background: var(--red);
 }
 
 .nav-group {
@@ -516,6 +744,39 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* Page-indicator dots beneath each section. */
+.nav-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.nav-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.nav-dot:hover {
+  transform: scale(1.25);
+}
+
+.nav-dot.on {
+  background: #fff;
+}
+
+.nav-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 /* White heading bar: prev triangle · name · next triangle. */

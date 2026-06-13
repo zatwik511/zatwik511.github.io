@@ -112,6 +112,10 @@ export interface NavGroup {
 export interface NowPlaying {
   track: string
   artist: string
+  /** Album art image URL. Optional; a placeholder shows until it's set. */
+  albumArt?: string
+  /** Whether the track is currently playing (vs. most-recently played). */
+  isPlaying?: boolean
 }
 
 /** Everything the site needs to render. */

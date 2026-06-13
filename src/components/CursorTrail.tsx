@@ -9,7 +9,7 @@ interface TrailPoint {
 }
 
 const RED = '#cf2424'
-const BLACK = '#000000'
+const WHITE = '#ffffff'
 
 /**
  * A comet-style trail that follows the cursor's red dot. Particles are tinted
@@ -43,13 +43,13 @@ export function CursorTrail() {
     let raf = 0
     let running = false
 
-    // Black over the cockpit panel, red elsewhere (windshield).
+    // White over the cockpit panel, red elsewhere (windshield).
     const colorAt = (x: number, y: number): string => {
       const el = document.querySelector('.cockpit')
       if (el) {
         const r = el.getBoundingClientRect()
         if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-          return BLACK
+          return WHITE
         }
       }
       return RED
