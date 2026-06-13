@@ -240,9 +240,26 @@ button {
   vertical-align: middle;
 }
 
+/* Pause the crawl while hovered. */
+.tick-wrap:hover .tick-track {
+  animation-play-state: paused;
+}
+
+/* Clickable skill names. */
+.tick-skill {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.tick-skill:hover {
+  color: var(--red-line);
+  text-decoration: underline;
+}
+
 /* ---- Windshield: launch button --------------------------------------- */
 
-/* Launch button now lives centered in a bottom bar. */
+/* Launch control centered in a bottom bar (no separator line). */
 .ws-launch-bar {
   position: relative;
   z-index: 1;
@@ -250,24 +267,48 @@ button {
   justify-content: center;
   padding: 10px;
   flex-shrink: 0;
-  border-top: 1px solid var(--seam);
 }
 
 .launch {
-  font-family: var(--mono);
-  font-size: 14px;
-  letter-spacing: 0.5px;
-  color: var(--red);
-  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
   border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
+  padding: 4px 12px;
   cursor: pointer;
+  color: #fff;
+}
+
+.launch-tri {
+  width: 60px;
+  height: 52px;
+  display: block;
+  fill: #fff;
+  transition: fill 0.18s ease;
+}
+
+.launch-label {
+  font-family: var(--mono);
+  font-size: 16px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+  transition: color 0.18s ease;
+}
+
+.launch:hover .launch-tri {
+  fill: var(--red);
+}
+
+.launch:hover .launch-label {
+  color: var(--red);
 }
 
 .launch:focus-visible {
   outline: 2px solid #fff;
-  outline-offset: 2px;
+  outline-offset: 4px;
 }
 
 /* ---- Windshield: scrollable content ---------------------------------- */
@@ -327,6 +368,7 @@ button {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 14px;
 }
 
 .ph {
@@ -350,7 +392,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 12px;
+  margin-top: 22px;
 }
 
 .tech-tag {
@@ -360,12 +402,26 @@ button {
   border: 1px solid var(--seam);
   border-radius: 999px;
   padding: 2px 9px;
+  text-decoration: none;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* Clickable tech tags lift + light up on hover. */
+a.tech-tag:hover {
+  color: #fff;
+  border-color: var(--red-line);
+  background: rgba(255, 90, 90, 0.14);
+  transform: translateY(-1px);
 }
 
 .openlnk {
   color: #ff9a9a;
   font-family: var(--mono);
-  font-size: 15px;
+  font-size: 26px;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
@@ -467,6 +523,11 @@ button {
 .np-loop span {
   flex: none;
   padding-right: 2.5em;
+}
+
+/* Pause the scrolling title while it's hovered. */
+.np-title:hover .np-loop {
+  animation-play-state: paused;
 }
 
 .np-artist {
@@ -1052,9 +1113,6 @@ button {
   }
   .eq i:nth-child(4) {
     animation-delay: 0.1s;
-  }
-  .launch {
-    animation: pulse 1.9s ease-in-out infinite;
   }
 }
 

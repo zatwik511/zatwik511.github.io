@@ -1,5 +1,6 @@
 export * from './types'
 export { profile } from './profile'
+export { skillUrl } from './skills'
 
 import { profile } from './profile'
 import type { Entry } from './types'

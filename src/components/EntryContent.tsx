@@ -1,4 +1,4 @@
-import type { Entry, ProjectEntry } from '../content'
+import { skillUrl, type Entry, type ProjectEntry } from '../content'
 
 /** Default greeting shown in the windshield before anything is selected. */
 function FlightDeck() {
@@ -17,8 +17,8 @@ function FlightDeck() {
 function ProjectDetail({ entry }: { entry: ProjectEntry }) {
   return (
     <>
-      <span className="ml ws-hud">{entry.hudLabel}</span>
-      <div className="ws-summary">{entry.summary}</div>
+      <span className="ml ws-hud">{entry.summary}</span>
+      <div className="ws-head">{entry.title}</div>
 
       <div className="media-row">
         {entry.media.map((m, i) => (
@@ -44,11 +44,24 @@ function ProjectDetail({ entry }: { entry: ProjectEntry }) {
 
       {entry.tech.length > 0 && (
         <div className="tech-row" aria-label="Tech stack">
-          {entry.tech.map((t) => (
-            <span className="tech-tag" key={t}>
-              {t}
-            </span>
-          ))}
+          {entry.tech.map((t) => {
+            const url = skillUrl(t)
+            return url ? (
+              <a
+                className="tech-tag"
+                key={t}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t}
+              </a>
+            ) : (
+              <span className="tech-tag" key={t}>
+                {t}
+              </span>
+            )
+          })}
         </div>
       )}
     </>

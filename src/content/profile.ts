@@ -211,8 +211,7 @@ export const profile: Profile = {
           navBlurb: 'Hospital management system',
           hudLabel: 'MEDISYNC',
           title: 'MediSync',
-          summary:
-            'Full-stack hospital management system · TypeScript, Node, PostgreSQL.',
+          summary: 'Full-stack hospital management system.',
           features:
             'Features: role-based access, appointment scheduling, records management, analytics dashboard. Feature-complete.',
           tech: ['TypeScript', 'Node.js', 'PostgreSQL'],
@@ -230,7 +229,7 @@ export const profile: Profile = {
           navBlurb: 'Dual-mode AI chatbot',
           hudLabel: 'ZATHAS AI',
           title: 'Zathas AI',
-          summary: 'Dual-mode AI chatbot · Groq + Gemini routing.',
+          summary: 'Dual-mode AI chatbot.',
           features:
             'Public layer plus a hidden admin panel, GitHub-to-Render auto-deploy. A "Peter Parker / Spider-Man" public-vs-private architecture.',
           tech: ['Groq', 'Gemini', 'Node.js', 'Render'],
@@ -248,7 +247,7 @@ export const profile: Profile = {
           navBlurb: 'NLP answer scoring',
           hudLabel: 'ANSWER EVAL',
           title: 'Answer Eval',
-          summary: 'Subjective answer evaluation · Python, NLP/ML.',
+          summary: 'Subjective answer evaluation.',
           features:
             'Scores free-text answers against a reference using semantic similarity and keyword analysis. In active development.',
           tech: ['Python', 'NLP', 'ML'],
@@ -266,7 +265,7 @@ export const profile: Profile = {
           navBlurb: 'Hand-tracked 3D pong',
           hudLabel: 'CV PING PONG',
           title: 'CV Ping Pong',
-          summary: 'Hand-tracked 3D pong in the browser · MediaPipe, Three.js.',
+          summary: 'Hand-tracked 3D pong in the browser.',
           features:
             'Tracks your hand via webcam to control a paddle in a 3D scene. Vite + TypeScript stack.',
           tech: ['MediaPipe', 'Three.js', 'Vite', 'TypeScript'],
@@ -284,7 +283,7 @@ export const profile: Profile = {
           navBlurb: 'This spaceship portfolio',
           hudLabel: 'ZATWIK.COM',
           title: 'zatwik.com',
-          summary: 'A spaceship-themed portfolio · React, TypeScript, (soon) R3F.',
+          summary: 'A spaceship-themed portfolio.',
           features:
             'A two-mode site: a static cockpit and a future 3D ride, both driven by one shared content source.',
           tech: ['React', 'TypeScript', 'Vite'],
