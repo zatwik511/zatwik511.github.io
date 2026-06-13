@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zatwik.com — static cockpit (layout reference)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<style>
+:root{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --red:#cf2424; --red-deep:#b31f1f; --red-line:#ff5a5a; --red-soft:#ffd6d6;
+  --sky:#07070a; --txt:#fff; --mut:#9a9aa0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#141416;font-family:var(--sans);display:flex;justify-content:center;align-items:center;min-height:100vh;padding:24px}
+.deck{display:flex;width:100%;max-width:1100px;height:min(80vh,640px);border-radius:14px;overflow:hidden}
+.windshield{position:relative;flex:1.6;min-width:0;background:var(--sky);display:flex;flex-direction:column}
+.stars{position:absolute;inset:0;opacity:.5}
+.ml{font-family:var(--mono);font-size:11px;letter-spacing:1.5px}
+.tick-wrap{position:relative;z-index:1;overflow:hidden;border-bottom:1px solid #4a1414;padding:7px 0;flex-shrink:0}
+.tick-track{display:inline-flex;white-space:nowrap;font-family:var(--mono);font-size:12px;color:#fff}
+.tick-track span{padding:0 14px}.tick-track b{color:#ff5a5a;font-weight:400}
+.launch{position:absolute;top:44px;right:12px;z-index:2;font-family:var(--mono);font-size:12px;letter-spacing:.5px;color:var(--red);background:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
+.ws-scroll{position:relative;z-index:1;flex:1;overflow-y:auto;padding:16px}
+.np{position:relative;z-index:1;display:flex;align-items:center;gap:10px;border-top:1px solid #4a1414;padding:9px 14px;flex-shrink:0}
+.eq{display:inline-flex;align-items:flex-end;gap:2px;height:13px}
+.eq i{width:3px;height:13px;background:#1DB954;transform-origin:bottom;transform:scaleY(.3)}
+.cockpit{flex:1;min-width:0;background:var(--red);border-left:2px solid var(--red-line);overflow-y:auto;padding:16px}
+.iclink{color:#fff;cursor:pointer;font-size:19px;display:inline-flex}
+.iclink:hover{color:var(--red-soft)}
+.navitem{background:var(--red-deep);border:1px solid #e86a6a;border-radius:7px;padding:7px 10px;color:#fff;cursor:pointer;text-align:left;font-size:13px;width:100%;margin-bottom:6px}
+.navitem:hover{border-color:#fff}
+.navitem.on{border:2px solid #fff;padding:6px 9px}
+.ph{flex:1;min-width:130px;min-height:88px;background:#101014;border:1px solid #2a2a2e;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#ff7a7a;font-family:var(--mono);font-size:12px}
+.openlnk{color:#ff9a9a;font-family:var(--mono);font-size:12px;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){
+  .tick-track{animation:scroll 24s linear infinite}
+  .eq i{animation:eq .9s ease-in-out infinite}
+  .eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}.eq i:nth-child(4){animation-delay:.1s}
+  .launch{animation:pulse 1.9s ease-in-out infinite}
+}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes eq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media (max-width:760px){ .deck{flex-direction:column;height:min(88vh,720px)} .cockpit{border-left:none;border-top:2px solid var(--red-line)} }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <div class="windshield">
+    <svg class="stars" width="100%" height="100%" viewBox="0 0 400 470" preserveAspectRatio="none" aria-hidden="true">
+      <circle cx="30" cy="40" r="1" fill="#fff"/><circle cx="110" cy="120" r="1.4" fill="#fff"/><circle cx="200" cy="60" r="1" fill="#fff"/><circle cx="280" cy="200" r="1.2" fill="#fff"/><circle cx="350" cy="90" r="1" fill="#fff"/><circle cx="60" cy="260" r="1.5" fill="#fff"/><circle cx="320" cy="320" r="1" fill="#fff"/><circle cx="150" cy="380" r="1.2" fill="#fff"/><circle cx="240" cy="430" r="1" fill="#fff"/><circle cx="380" cy="240" r="1" fill="#fff"/>
+    </svg>
+
+    <div class="tick-wrap" aria-hidden="true"><div class="tick-track">
+      <span>TypeScript<b> // </b></span><span>Python<b> // </b></span><span>C++<b> // </b></span><span>React<b> // </b></span><span>Node.js<b> // </b></span><span>PostgreSQL<b> // </b></span><span>Three.js<b> // </b></span><span>JavaScript<b> // </b></span><span>Git<b> // </b></span><span>HTML/CSS<b> // </b></span>
+      <span>TypeScript<b> // </b></span><span>Python<b> // </b></span><span>C++<b> // </b></span><span>React<b> // </b></span><span>Node.js<b> // </b></span><span>PostgreSQL<b> // </b></span><span>Three.js<b> // </b></span><span>JavaScript<b> // </b></span><span>Git<b> // </b></span><span>HTML/CSS<b> // </b></span>
+    </div></div>
+
+    <button class="launch">&#9650; LAUNCH 3D &#8599;</button>
+
+    <div class="ws-scroll">
+      <div id="ws-content">
+        <span class="ml" style="color:#ff7a7a">FLIGHT DECK</span>
+        <div style="font-size:16px;color:#fff;margin-top:8px;line-height:1.6">Welcome aboard.</div>
+        <div style="font-size:13px;color:#9a9aa0;margin-top:8px;line-height:1.6">Pick an instrument from the cockpit on the right &mdash; it loads here, and long entries scroll.</div>
+      </div>
+    </div>
+
+    <div class="np">
+      <i class="ti ti-brand-spotify" style="color:#1DB954;font-size:20px" aria-hidden="true"></i>
+      <div style="flex:1;min-width:0">
+        <div class="ml" style="color:#1DB954">NOW PLAYING</div>
+        <div style="font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Interstellar &mdash; Main Theme &middot; Hans Zimmer</div>
+      </div>
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    </div>
+  </div>
+
+  <div class="cockpit">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:19px;font-weight:500;color:#fff">Satwik Bhatnagar</span>
+      <span class="iclink" role="link" tabindex="0" aria-label="GitHub"><i class="ti ti-brand-github" aria-hidden="true"></i></span>
+      <span class="iclink" role="link" tabindex="0" aria-label="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></span>
+    </div>
+    <div style="font-size:12px;color:#ffd6d6;margin:4px 0 14px;line-height:1.5">Full-stack software engineer &middot; London.</div>
+
+    <span class="ml" style="color:#ffd6d6">EDUCATION</span>
+    <div style="margin:7px 0 12px">
+      <button class="navitem" onclick="show(this,'school')">School</button>
+      <button class="navitem" onclick="show(this,'bachelors')">Bachelor's</button>
+      <button class="navitem" onclick="show(this,'masters')">Master's</button>
+    </div>
+
+    <span class="ml" style="color:#ffd6d6">EXPERIENCE</span>
+    <div style="margin:7px 0 12px">
+      <button class="navitem" onclick="show(this,'job1')">Software intern &mdash; [company]</button>
+      <button class="navitem" onclick="show(this,'job2')">Part-time &mdash; [role]</button>
+    </div>
+
+    <span class="ml" style="color:#ffd6d6">PROJECTS</span>
+    <div style="margin:7px 0 0">
+      <button class="navitem" onclick="show(this,'medisync')">MediSync</button>
+      <button class="navitem" onclick="show(this,'zathas')">Zathas AI</button>
+      <button class="navitem" onclick="show(this,'eval')">Answer Eval</button>
+      <button class="navitem" onclick="show(this,'pong')">CV Ping Pong</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function txt(t,h,b){return '<span class="ml" style="color:#ff7a7a">'+t+'</span><div style="font-size:16px;color:#fff;margin-top:8px;line-height:1.6">'+h+'</div><div style="font-size:13px;color:#c4c4c9;margin-top:10px;line-height:1.7">'+b+'</div>';}
+function proj(t,d,feat,v,s,l){return '<span class="ml" style="color:#ff7a7a">'+t+'</span><div style="font-size:13px;color:#cfcfd4;margin:8px 0 10px;line-height:1.6">'+d+'</div><div style="display:flex;gap:10px;flex-wrap:wrap"><div class="ph">&#9658; '+v+'</div><div class="ph">'+s+'</div></div><div style="margin:12px 0 4px"><span class="openlnk">'+l+' &#8599;</span></div><div style="font-size:13px;color:#c4c4c9;margin-top:10px;line-height:1.7">'+feat+'</div>';}
+var W={
+school:txt('SCHOOL','[Your school] &middot; [years]','Add your school, board, and any standout results or activities here.'),
+bachelors:txt('BACHELOR\u2019S','[Degree] &middot; [University] &middot; [years]','Add your undergraduate degree, focus area, and notable coursework.'),
+masters:txt('MASTER\u2019S','MSc Software Engineering with Management Studies','Kingston University London &middot; 2025-26. Dissertation: quantifying software-delivery pipeline bottlenecks (the LPBQ model).'),
+job1:txt('SOFTWARE INTERN','[Company] &middot; [dates]','Add the role, the stack, and one or two things you shipped or improved.'),
+job2:txt('PART-TIME / FREELANCE','[Role] &middot; [dates]','Add part-time work, freelance web builds, or client projects.'),
+medisync:proj('MEDISYNC','Full-stack hospital management system &middot; TypeScript, Node, PostgreSQL.','Features: role-based access, appointment scheduling, records management, analytics dashboard. Feature-complete.','admin demo','landing page','open MediSync'),
+zathas:proj('ZATHAS AI','Dual-mode AI chatbot &middot; Groq + Gemini routing.','Public layer plus a hidden admin panel, GitHub-to-Render auto-deploy. A "Peter Parker / Spider-Man" public-vs-private architecture.','live demo','admin panel','open Zathas AI'),
+eval:proj('ANSWER EVAL','Subjective answer evaluation &middot; Python, NLP/ML.','Scores free-text answers against a reference using semantic similarity and keyword analysis. In active development.','demo run','results view','open project'),
+pong:proj('CV PING PONG','Hand-tracked 3D pong in the browser &middot; MediaPipe, Three.js.','Tracks your hand via webcam to control a paddle in a 3D scene. Vite + TypeScript stack.','gameplay clip','game screen','open game')
+};
+function show(btn,k){document.querySelectorAll('.navitem').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');var c=document.getElementById('ws-content');c.innerHTML=W[k];c.parentElement.scrollTop=0;}
+</script>
+</body>
+</html>
