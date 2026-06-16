@@ -71,7 +71,11 @@ function SocialIcon({ link }: { link: SocialLink }) {
 interface CockpitProps {
   profile: Profile
   selectedId: EntryId | null
+  /** Whether the Skills board is the active view. */
+  skillsActive: boolean
   onSelect: (id: EntryId) => void
+  /** Open the Skills board in the windshield. */
+  onSkills: () => void
   /** Clear the selection and return the windshield to the welcome screen. */
   onHome: () => void
 }
@@ -171,8 +175,16 @@ function NavSection({ group, selectedId, onSelect }: NavSectionProps) {
  * at the top, then grouped, clickable navigation that loads detail into the
  * windshield.
  */
-export function Cockpit({ profile, selectedId, onSelect, onHome }: CockpitProps) {
+export function Cockpit({
+  profile,
+  selectedId,
+  skillsActive,
+  onSelect,
+  onSkills,
+  onHome,
+}: CockpitProps) {
   const [emailOpen, setEmailOpen] = useState(false)
+  const homeActive = selectedId === null && !skillsActive
 
   return (
     <nav className="cockpit" aria-label="Cockpit controls">
@@ -210,8 +222,8 @@ export function Cockpit({ profile, selectedId, onSelect, onHome }: CockpitProps)
 
           <button
             type="button"
-            className={selectedId === null ? 'cp-name on' : 'cp-name'}
-            aria-pressed={selectedId === null}
+            className={homeActive ? 'cp-name on' : 'cp-name'}
+            aria-pressed={homeActive}
             onClick={onHome}
             aria-label={`${profile.name} — back to welcome screen`}
           >
@@ -257,6 +269,15 @@ export function Cockpit({ profile, selectedId, onSelect, onHome }: CockpitProps)
 
       <EmailModal open={emailOpen} onClose={() => setEmailOpen(false)} />
       <div className="cp-tagline">{profile.tagline}</div>
+
+      <button
+        type="button"
+        className={skillsActive ? 'cp-skills on' : 'cp-skills'}
+        aria-pressed={skillsActive}
+        onClick={onSkills}
+      >
+        Skills
+      </button>
 
       <div className="nav-deck">
         {profile.groups.map((group) => (

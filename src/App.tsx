@@ -1,16 +1,31 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { profile, getEntry, type EntryId } from './content'
 import { Windshield } from './components/Windshield'
 import { Cockpit } from './components/Cockpit'
 import { CursorTrail } from './components/CursorTrail'
 import { useNowPlaying } from './hooks/useNowPlaying'
 
+/** What the windshield is currently showing. */
+type View =
+  | { kind: 'home' }
+  | { kind: 'entry'; id: EntryId }
+  | { kind: 'skills' }
+
 export function App() {
-  const [selectedId, setSelectedId] = useState<EntryId | null>(null)
-  const selected = useMemo(
-    () => (selectedId ? getEntry(selectedId) ?? null : null),
-    [selectedId],
-  )
+  const [view, setView] = useState<View>({ kind: 'home' })
+  // Bumped on every cockpit button click; nudges the border triangles forward.
+  const [pulse, setPulse] = useState(0)
+  const show = (next: View) => {
+    setView(next)
+    setPulse((p) => p + 1)
+  }
+
+  // Resolved fresh every render (not memoised) so editing a page's markdown
+  // hot-reloads into the windshield even while that page is open.
+  const selected = view.kind === 'entry' ? getEntry(view.id) ?? null : null
+  const showSkills = view.kind === 'skills'
+  // The entry id the cockpit should highlight (none while home/skills).
+  const selectedId = view.kind === 'entry' ? view.id : null
 
   // Live Spotify track (falls back to the static profile track until/if it loads).
   const livePlaying = useNowPlaying()
@@ -26,16 +41,20 @@ export function App() {
     <main className="deck">
       <CursorTrail />
       <Windshield
-        skills={profile.skills}
         nowPlaying={nowPlaying}
         selected={selected}
+        showSkills={showSkills}
+        skillGroups={profile.skillGroups}
+        pulse={pulse}
         onLaunch={handleLaunch}
       />
       <Cockpit
         profile={profile}
         selectedId={selectedId}
-        onSelect={setSelectedId}
-        onHome={() => setSelectedId(null)}
+        skillsActive={showSkills}
+        onSelect={(id) => show({ kind: 'entry', id })}
+        onSkills={() => show({ kind: 'skills' })}
+        onHome={() => show({ kind: 'home' })}
       />
     </main>
   )

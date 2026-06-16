@@ -1,9 +1,20 @@
 export * from './types'
-export { profile } from './profile'
 export { skillUrl } from './skills'
+export { site } from './site'
 
-import { profile } from './profile'
-import type { Entry } from './types'
+import { site } from './site'
+import { loadGroups } from './loader'
+import type { Entry, Profile } from './types'
+
+/**
+ * The full profile the UI renders: site identity (site.ts) stitched together
+ * with the per-page content discovered in the `pages/` folders (loader.ts).
+ * Add a page = add a folder; no code change needed.
+ */
+export const profile: Profile = {
+  ...site,
+  groups: loadGroups(),
+}
 
 /** Flat list of every openable entry, in cockpit order. */
 export const allEntries: Entry[] = profile.groups.flatMap((g) => g.entries)

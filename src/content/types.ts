@@ -45,15 +45,34 @@ export interface UniversePlacement {
   system?: string
 }
 
+export interface ProjectMedia {
+  type: 'video' | 'image'
+  /** Asset URL. Optional while assets are still placeholders. */
+  src?: string
+  /** Caption / placeholder text shown until an asset is wired up. */
+  caption: string
+}
+
+export interface ExternalLink {
+  label: string
+  url: string
+}
+
 interface EntryBase {
   id: EntryId
   kind: EntryKind
+  /** Sort position within its section (from front-matter `order:`). */
+  order?: number
   /** Short label for the cockpit nav button. */
   navLabel: string
   /** One-line description shown under the title on the nav button. */
   navBlurb: string
   /** Monospace HUD micro-label shown atop the windshield panel. */
   hudLabel: string
+  /** Page attachments (photos / videos), authored by dropping files in the folder. */
+  media?: ProjectMedia[]
+  /** External links rendered as "label ↗" buttons on the page. */
+  links?: ExternalLink[]
   universe?: UniversePlacement
 }
 
@@ -74,31 +93,16 @@ export interface ExperienceEntry extends EntryBase {
   body: string
 }
 
-export interface ProjectMedia {
-  type: 'video' | 'image'
-  /** Asset URL. Optional while assets are still placeholders. */
-  src?: string
-  /** Caption / placeholder text shown until an asset is wired up. */
-  caption: string
-}
-
-export interface ExternalLink {
-  label: string
-  url: string
-}
-
 export interface ProjectEntry extends EntryBase {
   kind: 'project'
   title: string
   summary: string
-  /** One-paragraph feature description. */
+  /** Feature description, rendered from the page's markdown body (HTML). */
   features: string
   /** Tech stack tags. */
   tech: string[]
   /** Demo video + landing screenshot, per the brief. */
   media: ProjectMedia[]
-  /** Link to open the live project, if it has one. */
-  link?: ExternalLink
 }
 
 export type Entry = EducationEntry | ExperienceEntry | ProjectEntry
@@ -107,6 +111,12 @@ export type Entry = EducationEntry | ExperienceEntry | ProjectEntry
 export interface NavGroup {
   heading: string
   entries: Entry[]
+}
+
+/** A category of skills (e.g. "Languages", "AI Tools") for the skills board. */
+export interface SkillGroup {
+  heading: string
+  items: string[]
 }
 
 export interface NowPlaying {
@@ -131,8 +141,8 @@ export interface Profile {
   /** Direct contact address for the email popup. */
   contactEmail: string
   socials: SocialLink[]
-  /** Drives the windshield skills ticker. */
-  skills: string[]
+  /** Categorised skills shown on the cockpit's Skills board. */
+  skillGroups: SkillGroup[]
   /** Fallback now-playing track until the Spotify function lands (Phase 4). */
   nowPlaying: NowPlaying
   groups: NavGroup[]
