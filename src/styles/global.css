@@ -2151,12 +2151,8 @@ a.tech-tag:hover {
     inset 0 0 0 1px rgba(207, 36, 36, 0.18);
 }
 
-/* On the narrow phone layout, two per row keeps labels readable. */
-@media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
-  .nav-items {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+/* Mobile keeps the desktop 3-up nav grid (one row per section) — see the
+   consolidated mobile block at the end of this file. */
 
 /* ---- Motion: everything pauses for reduced-motion -------------------- */
 
@@ -2355,59 +2351,66 @@ a.tech-tag:hover {
     display: none;
   }
   .ws-scroll {
-    padding: 62px 20px 16px;
+    padding: 58px 18px 14px;
   }
   .ws-head {
-    font-size: clamp(24px, 7vw, 34px);
+    font-size: clamp(22px, 6.5vw, 32px);
   }
   .ws-meta {
-    font-size: clamp(16px, 4.6vw, 22px);
+    font-size: clamp(15px, 4.4vw, 21px);
   }
   .ws-home {
-    gap: 12px;
+    gap: 10px;
   }
   .ws-home-photo {
-    width: clamp(120px, 30vw, 180px);
+    width: clamp(110px, 28vw, 168px);
   }
   .ws-home-intro {
-    font-size: 15px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.45;
   }
   .ws-launch-bar {
-    padding: 6px 12px 16px;
+    padding: 4px 12px 12px;
   }
   .launch-tri {
-    width: 44px;
-    height: 38px;
+    width: 40px;
+    height: 34px;
   }
   .launch-label {
-    font-size: 13px;
+    font-size: 12px;
   }
 
-  /* Smaller now-playing widget so it doesn't dominate the half-height panel. */
+  /* Smaller now-playing widget, properly clipped so it never spills wide. */
   .ws-np-corner {
     top: 10px;
     right: 10px;
   }
   .np {
-    max-width: 156px;
+    max-width: 150px;
     gap: 8px;
-    padding: 7px 9px 6px;
+    padding: 6px 8px 5px;
+    overflow: hidden;
+  }
+  .np-info {
+    min-width: 0;
   }
   .np-art {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
   .np-title span {
-    font-size: 15px;
+    font-size: 14px;
   }
   .np-artist {
-    font-size: 12px;
+    font-size: 11px;
+  }
+  .np-label {
+    font-size: 11px;
   }
 
   /* --- Cockpit (bottom half) --- */
-  /* Stop the nav from squishing into itself; it sizes naturally and the panel
-     scrolls if needed (no more overlapping section headings). */
+  /* Nav sizes naturally (no flex squish → no overlapping headings) and the
+     desktop 3-up grid is kept so each section is a single short row. */
   .nav-deck,
   .nav-group,
   .nav-items {
@@ -2415,63 +2418,71 @@ a.tech-tag:hover {
     min-height: 0;
   }
 
-  .cp-header {
+  .cockpit {
+    padding: 10px;
     gap: 6px;
   }
+  .cp-header {
+    gap: 4px;
+  }
   .cp-name {
-    font-size: clamp(20px, 6vw, 30px);
-    padding: 6px 14px;
+    font-size: clamp(18px, 5.5vw, 28px);
+    padding: 5px 12px;
   }
   .cp-name-row {
     gap: 10px;
   }
   .cp-flank {
-    width: clamp(52px, 16vw, 78px);
-    height: clamp(62px, 20vw, 94px);
+    width: clamp(48px, 15vw, 72px);
+    height: clamp(58px, 18vw, 86px);
   }
   .cp-socials {
-    gap: 18px;
+    gap: 16px;
   }
   /* Tagline on its own line; Skills / Hobbies side by side beneath it. */
   .cp-controls {
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 8px 0;
+    gap: 6px;
+    margin: 6px 0;
   }
   .cp-tagline {
     flex-basis: 100%;
     order: -1;
-    font-size: 13px;
+    font-size: 12px;
   }
   .cp-tab {
-    font-size: 14px;
-    padding: 7px 14px;
+    font-size: 13px;
+    padding: 6px 12px;
     letter-spacing: 1px;
   }
 
   .nav-deck {
-    padding: 10px;
-    gap: 8px;
-  }
-  .nav-group {
+    padding: 8px;
     gap: 6px;
   }
+  .nav-group {
+    gap: 4px;
+  }
   .nav-group-heading {
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 1px;
   }
   .nav-items {
-    gap: 8px;
+    gap: 6px;
   }
   .navitem {
-    min-height: 46px;
-    padding: 6px 9px;
+    min-height: 40px;
+    padding: 5px 6px;
   }
   .navitem-title {
-    font-size: 14px;
+    font-size: 12.5px;
   }
   .navitem-blurb {
-    font-size: 10.5px;
+    font-size: 9.5px;
+    line-height: 1.15;
+  }
+  .nav-dots {
+    margin-top: 2px;
   }
 }
 
