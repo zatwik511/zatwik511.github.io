@@ -407,16 +407,89 @@ button {
 
 /* Phone (portrait): windshield on top, cockpit below, horizontal seam. */
 @media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
+  /* On phones the two panels stack and the PAGE scrolls, instead of being
+     squeezed into two fixed half-height panels that scroll independently. */
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+  }
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .deck {
     flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
   }
+
+  /* Windshield: a hero on top that grows with its content. */
   .windshield {
-    flex: 1;
+    flex: none;
+    min-height: 72vh;
   }
+  .ws-scroll {
+    overflow-y: visible;
+  }
+  .ws-head {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+  .ws-meta {
+    font-size: clamp(17px, 5vw, 24px);
+  }
+  .ws-widget-spacer {
+    width: min(190px, 44%);
+    height: 84px;
+  }
+  .ws-np-corner {
+    top: 14px;
+    right: 14px;
+  }
+  .np {
+    max-width: 210px;
+    padding: 10px 12px 9px;
+  }
+
+  /* Cockpit: natural height below; the page (not the panel) scrolls. */
   .cockpit {
-    flex: 1;
+    flex: none;
+    overflow-y: visible;
     border-left: none;
     border-top: 2px solid var(--red-line);
+  }
+  .nav-deck,
+  .nav-group,
+  .nav-items {
+    flex: none;
+    min-height: 0;
+  }
+  .nav-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Shrink oversized header pieces for narrow screens. */
+  .cp-name {
+    font-size: clamp(24px, 7vw, 38px);
+  }
+  .cp-name-row {
+    gap: 12px;
+  }
+  .cp-flank {
+    width: clamp(62px, 19vw, 92px);
+    height: clamp(76px, 23vw, 110px);
+  }
+  /* Tagline on its own line; Skills / Hobbies side by side beneath it. */
+  .cp-controls {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .cp-tagline {
+    flex-basis: 100%;
+    order: -1;
   }
 }
 
