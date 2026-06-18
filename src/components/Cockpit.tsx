@@ -5,6 +5,7 @@ import {
   IconPhone,
   IconMail,
 } from '@tabler/icons-react'
+import type { Preview } from '../App'
 import type { EntryId, NavGroup, Profile, SocialLink } from '../content'
 import { EmailModal } from './EmailModal'
 import { HullDecor } from './HullDecor'
@@ -41,10 +42,10 @@ function SocialIcon({ link }: { link: SocialLink }) {
       </button>
     )
   } else {
-    const href =
-      link.action.kind === 'mailto'
-        ? `mailto:${link.action.address}`
-        : link.action.url
+    let href = '#'
+    if (link.action.kind === 'mailto') href = `mailto:${link.action.address}`
+    else if (link.action.kind === 'tel') href = `tel:${link.action.number}`
+    else if (link.action.kind === 'link') href = link.action.url
     const external = link.action.kind === 'link'
     trigger = (
       <a
@@ -73,11 +74,19 @@ interface CockpitProps {
   selectedId: EntryId | null
   /** Whether the Skills board is the active view. */
   skillsActive: boolean
+  /** Whether the Hobbies board is the active view. */
+  hobbiesActive: boolean
   onSelect: (id: EntryId) => void
   /** Open the Skills board in the windshield. */
   onSkills: () => void
+  /** Open the Hobbies board in the windshield. */
+  onHobbies: () => void
   /** Clear the selection and return the windshield to the welcome screen. */
   onHome: () => void
+  /** Show a transient label preview in the windshield (button hover/focus). */
+  onPreview: (p: Preview) => void
+  /** Clear the hover preview (button leave/blur). */
+  onPreviewEnd: () => void
 }
 
 const PAGE_SIZE = 3
@@ -86,6 +95,8 @@ interface NavSectionProps {
   group: NavGroup
   selectedId: EntryId | null
   onSelect: (id: EntryId) => void
+  onPreview: (p: Preview) => void
+  onPreviewEnd: () => void
 }
 
 /**
@@ -93,7 +104,13 @@ interface NavSectionProps {
  * the red triangles either side of the heading page through the rest, so a
  * section can hold any number of entries (more projects, jobs, certificates).
  */
-function NavSection({ group, selectedId, onSelect }: NavSectionProps) {
+function NavSection({
+  group,
+  selectedId,
+  onSelect,
+  onPreview,
+  onPreviewEnd,
+}: NavSectionProps) {
   const [page, setPage] = useState(0)
   const [dir, setDir] = useState<'next' | 'prev'>('next')
 
@@ -145,6 +162,14 @@ function NavSection({ group, selectedId, onSelect }: NavSectionProps) {
               className={on ? 'navitem on' : 'navitem'}
               aria-pressed={on}
               onClick={() => onSelect(entry.id)}
+              onMouseEnter={() =>
+                on || onPreview({ title: entry.navLabel, blurb: entry.navBlurb })
+              }
+              onMouseLeave={onPreviewEnd}
+              onFocus={() =>
+                on || onPreview({ title: entry.navLabel, blurb: entry.navBlurb })
+              }
+              onBlur={onPreviewEnd}
             >
               <span className="navitem-title">{entry.navLabel}</span>
               <span className="navitem-blurb">{entry.navBlurb}</span>
@@ -179,16 +204,22 @@ export function Cockpit({
   profile,
   selectedId,
   skillsActive,
+  hobbiesActive,
   onSelect,
   onSkills,
+  onHobbies,
   onHome,
+  onPreview,
+  onPreviewEnd,
 }: CockpitProps) {
   const [emailOpen, setEmailOpen] = useState(false)
-  const homeActive = selectedId === null && !skillsActive
+  const homeActive = selectedId === null && !skillsActive && !hobbiesActive
 
   return (
     <nav className="cockpit" aria-label="Cockpit controls">
       <HullDecor />
+      {/* Boot-up: the touch-display screen powering on. */}
+      <div className="cp-screen" aria-hidden="true" />
       <div className="cp-header">
         <div className="cp-name-row">
           <button
@@ -225,6 +256,10 @@ export function Cockpit({
             className={homeActive ? 'cp-name on' : 'cp-name'}
             aria-pressed={homeActive}
             onClick={onHome}
+            onMouseEnter={() => homeActive || onPreview({ title: 'About Me' })}
+            onMouseLeave={onPreviewEnd}
+            onFocus={() => homeActive || onPreview({ title: 'About Me' })}
+            onBlur={onPreviewEnd}
             aria-label={`${profile.name} — back to welcome screen`}
           >
             {profile.name}
@@ -233,7 +268,7 @@ export function Cockpit({
           <a
             className="cp-flank cp-flank-right"
             href={profile.cvUrl}
-            download
+            download="Satwik_Bhatnagar_CV.pdf"
             aria-label="Download my CV (PDF)"
           >
             <svg className="flank-tri" viewBox="0 0 96 114" aria-hidden="true">
@@ -268,16 +303,44 @@ export function Cockpit({
       </div>
 
       <EmailModal open={emailOpen} onClose={() => setEmailOpen(false)} />
-      <div className="cp-tagline">{profile.tagline}</div>
 
-      <button
-        type="button"
-        className={skillsActive ? 'cp-skills on' : 'cp-skills'}
-        aria-pressed={skillsActive}
-        onClick={onSkills}
-      >
-        Skills
-      </button>
+      {/* Skills (left) and Hobbies (right) flank the tagline, sitting over the
+          circuit pockets either side. */}
+      <div className="cp-controls">
+        <button
+          type="button"
+          className={skillsActive ? 'cp-tab on' : 'cp-tab'}
+          aria-pressed={skillsActive}
+          onClick={onSkills}
+          onMouseEnter={() =>
+            skillsActive || onPreview({ title: 'Skills', blurb: 'Flight systems' })
+          }
+          onMouseLeave={onPreviewEnd}
+          onFocus={() =>
+            skillsActive || onPreview({ title: 'Skills', blurb: 'Flight systems' })
+          }
+          onBlur={onPreviewEnd}
+        >
+          Skills
+        </button>
+        <div className="cp-tagline">{profile.tagline}</div>
+        <button
+          type="button"
+          className={hobbiesActive ? 'cp-tab on' : 'cp-tab'}
+          aria-pressed={hobbiesActive}
+          onClick={onHobbies}
+          onMouseEnter={() =>
+            hobbiesActive || onPreview({ title: 'Hobbies', blurb: 'Off duty' })
+          }
+          onMouseLeave={onPreviewEnd}
+          onFocus={() =>
+            hobbiesActive || onPreview({ title: 'Hobbies', blurb: 'Off duty' })
+          }
+          onBlur={onPreviewEnd}
+        >
+          Hobbies
+        </button>
+      </div>
 
       <div className="nav-deck">
         {profile.groups.map((group) => (
@@ -286,6 +349,8 @@ export function Cockpit({
             group={group}
             selectedId={selectedId}
             onSelect={onSelect}
+            onPreview={onPreview}
+            onPreviewEnd={onPreviewEnd}
           />
         ))}
       </div>

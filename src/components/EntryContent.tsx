@@ -1,18 +1,85 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { skillUrl, type Entry, type ProjectMedia } from '../content'
+import {
+  homeContent,
+  homePhotos,
+  site,
+  skillUrl,
+  type Entry,
+  type ProjectMedia,
+} from '../content'
 
-/** Default greeting shown in the windshield before anything is selected. */
+/** Welcome screen shown in the windshield before anything is selected. The
+ *  heading and paragraph are authored in the markdown file in pages/Home/
+ *  (falling back to site.home). The photo(s) come from pages/Home/ too: a
+ *  `primary` and `secondary` image enable the Time Travel crossfade; otherwise
+ *  the first image (or home.photo) is shown. */
 function FlightDeck() {
+  const { photo } = site.home
+  const heading = homeContent?.heading || site.home.heading
+  const introHtml = homeContent?.introHtml
+  const [traveled, setTraveled] = useState(false)
+
+  const primary =
+    homePhotos.find((p) => p.name.includes('primary'))?.src ??
+    homePhotos[0]?.src ??
+    photo
+  const secondary =
+    homePhotos.find((p) => p.name.includes('secondary'))?.src ?? homePhotos[1]?.src
+
+  const canTravel = Boolean(primary && secondary && primary !== secondary)
+
   return (
-    <>
+    <div className="ws-home">
       <span className="ml ws-hud">FLIGHT DECK</span>
-      <div className="ws-head">Welcome aboard.</div>
-      <div className="ws-meta">
-        Pick an instrument from the cockpit — it loads here, and long entries
-        scroll.
+      <div className="ws-head">{heading}</div>
+
+      <div className="ws-home-photo">
+        {primary ? (
+          <>
+            <img
+              className="ws-home-img"
+              src={primary}
+              alt=""
+              style={{ opacity: traveled ? 0 : 1 }}
+            />
+            {secondary && (
+              <img
+                className="ws-home-img"
+                src={secondary}
+                alt=""
+                style={{ opacity: traveled ? 1 : 0 }}
+              />
+            )}
+          </>
+        ) : (
+          <span className="ws-home-ph">
+            1:1 square photo
+            <small>drop one in pages/Home/</small>
+          </span>
+        )}
+
+        {canTravel && (
+          <button
+            type="button"
+            className="ws-travel"
+            onClick={() => setTraveled((t) => !t)}
+            aria-pressed={traveled}
+          >
+            Time Travel
+          </button>
+        )}
       </div>
-    </>
+
+      {introHtml ? (
+        <div
+          className="ws-home-intro"
+          dangerouslySetInnerHTML={{ __html: introHtml }}
+        />
+      ) : (
+        <p className="ws-home-intro">{site.home.intro}</p>
+      )}
+    </div>
   )
 }
 
@@ -124,6 +191,38 @@ function MediaRow({
   )
 }
 
+/** Download buttons for files dropped in the page folder (e.g. installers). */
+function Downloads({ entry }: { entry: Entry }) {
+  if (!entry.downloads || entry.downloads.length === 0) return null
+  return (
+    <div className="dl-row">
+      {entry.downloads.map((d, i) => (
+        <a className="dllnk" key={i} href={d.url} download={d.filename}>
+          {d.label} ↓
+        </a>
+      ))}
+    </div>
+  )
+}
+
+/** Small framed box with a button that opens the certificate PDF in a new tab. */
+function CertCard({ url }: { url: string }) {
+  return (
+    <div className="cert-card">
+      <svg className="cert-card-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 2.5h8L18 6.5V21.5H6Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M13.5 2.5V7H18" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="9" y1="15.5" x2="15" y2="15.5" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+      <span className="cert-card-title">Certificate</span>
+      <a className="cert-view" href={url} target="_blank" rel="noopener noreferrer">
+        View Certificate ↗
+      </a>
+    </div>
+  )
+}
+
 /** The "open ↗" link buttons, shared by every page kind. */
 function Links({ entry }: { entry: Entry }) {
   if (!entry.links || entry.links.length === 0) return null
@@ -161,6 +260,7 @@ export function EntryContent({ entry }: { entry: Entry | null }) {
 
         <MediaRow entry={entry} onPreview={setPreview} />
         <Links entry={entry} />
+        <Downloads entry={entry} />
 
         <div
           className="ws-body"
@@ -192,7 +292,8 @@ export function EntryContent({ entry }: { entry: Entry | null }) {
       </>
     )
   } else {
-    // education / experience: small photo floated into the top-right, text wraps.
+    // education / experience: small photo (or certificate box) floated into the
+    // top-right, text wraps around it.
     content = (
       <>
         {entry.media && entry.media.length > 0 && (
@@ -202,10 +303,14 @@ export function EntryContent({ entry }: { entry: Entry | null }) {
             ))}
           </div>
         )}
+        {(!entry.media || entry.media.length === 0) && entry.certificateUrl && (
+          <CertCard url={entry.certificateUrl} />
+        )}
         <span className="ml ws-hud">{entry.hudLabel}</span>
         <div className="ws-head">{entry.title}</div>
         {entry.meta && <div className="ws-meta">{entry.meta}</div>}
         <Links entry={entry} />
+        <Downloads entry={entry} />
         <div className="ws-body" dangerouslySetInnerHTML={{ __html: entry.body }} />
       </>
     )

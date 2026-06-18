@@ -20,7 +20,9 @@ export type SocialAction =
   | { kind: 'link'; url: string }
   /** Start an email to this address (mailto:). */
   | { kind: 'mailto'; address: string }
-  /** Copy this value to the clipboard (phone number). */
+  /** Open the phone dialler with this number prefilled (tel:). */
+  | { kind: 'tel'; number: string }
+  /** Copy this value to the clipboard. */
   | { kind: 'copy'; value: string }
 
 export interface SocialLink {
@@ -58,6 +60,16 @@ export interface ExternalLink {
   url: string
 }
 
+/** A downloadable file dropped in the page folder (e.g. an installer). */
+export interface DownloadFile {
+  /** Button text, e.g. "Download installer". */
+  label: string
+  /** Asset URL. */
+  url: string
+  /** Original filename, used as the saved name. */
+  filename: string
+}
+
 interface EntryBase {
   id: EntryId
   kind: EntryKind
@@ -73,6 +85,10 @@ interface EntryBase {
   media?: ProjectMedia[]
   /** External links rendered as "label ↗" buttons on the page. */
   links?: ExternalLink[]
+  /** Downloadable files (installers, archives) dropped in the folder. */
+  downloads?: DownloadFile[]
+  /** A certificate PDF dropped in the folder, opened via "View Certificate". */
+  certificateUrl?: string
   universe?: UniversePlacement
 }
 
@@ -119,6 +135,16 @@ export interface SkillGroup {
   items: string[]
 }
 
+/** The welcome screen shown when the name (home) is selected. */
+export interface HomeIntro {
+  /** Big heading line. */
+  heading: string
+  /** Intro paragraph (editable prose). */
+  intro: string
+  /** Square (1:1) photo in public/, e.g. '/me.jpg'. Empty shows a placeholder. */
+  photo: string
+}
+
 export interface NowPlaying {
   track: string
   artist: string
@@ -141,8 +167,12 @@ export interface Profile {
   /** Direct contact address for the email popup. */
   contactEmail: string
   socials: SocialLink[]
+  /** The welcome screen (shown on home). */
+  home: HomeIntro
   /** Categorised skills shown on the cockpit's Skills board. */
   skillGroups: SkillGroup[]
+  /** Categorised hobbies shown on the cockpit's Hobbies board. */
+  hobbyGroups: SkillGroup[]
   /** Fallback now-playing track until the Spotify function lands (Phase 4). */
   nowPlaying: NowPlaying
   groups: NavGroup[]

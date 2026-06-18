@@ -89,6 +89,144 @@ button {
   height: 100dvh;
 }
 
+/* ---- Boot-up intro sequence ------------------------------------------ */
+
+/* Black "screen off" panels over each side; powered on during boot, hidden
+   otherwise. The windshield reveals the starfield, the cockpit flickers on
+   like a touch display. */
+.ws-screen,
+.cp-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: #050507;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The cockpit powers on FIRST (its display flickers on, then it lights up
+     element by element), then the windshield screen powers on and loads. */
+
+  /* --- Cockpit (first) --- */
+  .deck.booting .cp-screen {
+    background: #070407;
+    animation: boot-crt-on 0.6s linear forwards;
+  }
+  .deck.booting .cp-name {
+    animation: boot-rise 0.4s ease 0.45s backwards;
+  }
+  .deck.booting .cp-flank {
+    animation: boot-rise 0.4s ease 0.6s backwards;
+  }
+  .deck.booting .cp-socials {
+    animation: boot-rise 0.4s ease 0.75s backwards;
+  }
+  .deck.booting .cp-tagline {
+    animation: boot-rise 0.4s ease 0.9s backwards;
+  }
+  .deck.booting .cp-tab {
+    animation: boot-rise 0.4s ease 1.05s backwards;
+  }
+  .deck.booting .nav-deck {
+    animation: boot-fade 0.45s ease 1.3s backwards;
+  }
+  .deck.booting .nav-deck .nav-group:nth-child(1) {
+    animation: boot-rise 0.4s ease 1.55s backwards;
+  }
+  .deck.booting .nav-deck .nav-group:nth-child(2) {
+    animation: boot-rise 0.4s ease 1.7s backwards;
+  }
+  .deck.booting .nav-deck .nav-group:nth-child(3) {
+    animation: boot-rise 0.4s ease 1.85s backwards;
+  }
+
+  /* --- Windshield (after the cockpit) --- */
+  /* Hold the screen black until the cockpit is up, then power it off to reveal
+     the starfield. */
+  .deck.booting .ws-screen {
+    animation: boot-screen-out 0.6s ease 1.9s both;
+  }
+  /* Border + rule fade, then now-playing/launch pop, then all content fades. */
+  .deck.booting .ws-border,
+  .deck.booting .ws-rule {
+    animation: boot-fade 0.5s ease 2.5s backwards;
+  }
+  .deck.booting .ws-np-corner,
+  .deck.booting .launch {
+    animation: boot-pop 0.42s cubic-bezier(0.2, 1.3, 0.4, 1) 2.9s backwards;
+  }
+  .deck.booting .ws-scroll {
+    animation: boot-fade 0.55s ease 3.25s backwards;
+  }
+}
+
+@keyframes boot-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes boot-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes boot-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes boot-screen-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* CRT-style power-on flicker for the cockpit display. */
+@keyframes boot-crt-on {
+  0% {
+    opacity: 1;
+  }
+  34% {
+    opacity: 1;
+  }
+  44% {
+    opacity: 0.2;
+  }
+  54% {
+    opacity: 0.7;
+  }
+  64% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* PC (landscape): windshield ~60% left, cockpit ~40% right, vertical seam. */
 .windshield {
   position: relative;
@@ -372,7 +510,7 @@ button {
 }
 
 /* While a sweep runs, the head's glow switches off, then back on when it ends. */
-.ws-border.ws-sweep i:first-child {
+.ws-sweep .ws-border i:first-child {
   animation: head-blink var(--spark-ms, 300ms) linear forwards;
 }
 
@@ -413,7 +551,7 @@ button {
   pointer-events: none;
 }
 
-.ws-border.ws-sweep .ws-spark {
+.ws-sweep .ws-spark {
   animation: spark-lap var(--spark-ms, 300ms) linear forwards;
 }
 
@@ -433,9 +571,79 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
   .ws-border i:first-child,
-  .ws-border.ws-sweep .ws-spark,
-  .ws-border.ws-sweep i:first-child {
+  .ws-sweep .ws-spark,
+  .ws-sweep .ws-border i:first-child,
+  .ws-page {
     animation: none;
+  }
+}
+
+/* ---- Windshield: page fade-in + hover preview ------------------------ */
+
+/* Each freshly fetched page fades in. Keyed remount in Windshield.tsx
+   replays this on every cockpit click. */
+.ws-page {
+  animation: page-fade-in var(--spark-ms, 600ms) ease-out;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Transient hover preview overlay: the button's label + blurb on a solid
+   black panel covering the current page. Non-interactive — just a readout. */
+.ws-preview {
+  position: absolute;
+  /* Sit just inside the ws-rule (at 22px) so the frame line stays visible, and
+     cover the full interior down to the bottom rule so the Launch 3D button is
+     hidden behind the preview. */
+  inset: 30px;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 clamp(28px, 5vw, 56px);
+  /* Same look as the windshield itself: the starfield photo under the
+     left-weighted dark wash, so the preview reads as part of the deck (and
+     fully hides the page beneath). */
+  background-color: var(--sky);
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.4) 42%, rgba(0, 0, 0, 0.18) 100%),
+    url('/starfield.jpg');
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.4) 42%, rgba(0, 0, 0, 0.18) 100%),
+    -webkit-image-set(url('/starfield.avif') type('image/avif'), url('/starfield.jpg') type('image/jpeg'));
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.68) 0%, rgba(0, 0, 0, 0.4) 42%, rgba(0, 0, 0, 0.18) 100%),
+    image-set(url('/starfield.avif') type('image/avif'), url('/starfield.jpg') type('image/jpeg'));
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* Opacity + transition duration are driven inline (see Windshield.tsx): the
+     overlay crossfades in on appear and out on click/leave. A transition (not
+     a keyframe) means an interrupted fade never snaps. */
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+/* Inner text remounts (keyed) on each preview change, replaying this fade so
+   the label crossfades when switching from one preview to another. */
+.ws-preview-text {
+  animation: preview-text-in 260ms ease;
+}
+
+@keyframes preview-text-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -616,6 +824,123 @@ button {
   color: #c4c4c9;
   margin-top: 6px;
   line-height: 1.5;
+}
+
+/* ---- Windshield: welcome (home) screen ------------------------------- */
+
+.ws-home {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+/* Centred 1:1 square photo (or placeholder until a photo is added). The hud
+   label and heading stay left-aligned; only the photo and intro are centred. */
+.ws-home-photo {
+  align-self: center;
+  position: relative;
+  width: clamp(200px, 34vh, 340px);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Stacked images crossfade between primary and secondary (Time Travel). */
+.ws-home-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.6s ease;
+}
+
+/* Time Travel toggle, overlaid on the bottom of the picture. */
+.ws-travel {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+  border: 2px solid #fff;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.ws-travel:hover {
+  transform: translateX(-50%) translateY(-2px);
+  background: linear-gradient(180deg, #e23a3a 0%, var(--red) 100%);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+.ws-travel:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Dashed frame + hint while no photo is set. */
+.ws-home-photo:has(.ws-home-ph) {
+  border-style: dashed;
+  border-color: var(--red-line);
+}
+
+.ws-home-ph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--hud);
+}
+
+.ws-home-ph small {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  color: #8a8a90;
+}
+
+.ws-home-intro {
+  max-width: none;
+  margin: 0;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #cfcfd4;
+}
+
+.ws-home-intro p {
+  margin: 0 0 0.6em;
+}
+
+.ws-home-intro p:last-child {
+  margin-bottom: 0;
 }
 
 .ws-summary {
@@ -852,6 +1177,69 @@ button {
   object-fit: contain;
 }
 
+/* Certificate box, floated top-right like the figure (text wraps around it). */
+.cert-card {
+  float: right;
+  clear: right;
+  width: min(230px, 44%);
+  margin: 6px 0 14px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 16px;
+  border: 2px solid var(--red-line);
+  background: rgba(0, 0, 0, 0.32);
+  text-align: center;
+}
+
+.cert-card-icon {
+  width: 40px;
+  height: 40px;
+  color: #fff;
+}
+
+.cert-card-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--hud);
+}
+
+.cert-view {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+  border: 2px solid #fff;
+  padding: 8px 14px;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.cert-view:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #e23a3a 0%, var(--red) 100%);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+.cert-view:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
 /* Markdown rendered inside the windshield body. */
 .ws-body p {
   margin: 0 0 0.5em;
@@ -1016,6 +1404,51 @@ a.tech-tag:hover {
 
 .openlnk:hover {
   color: var(--red-line);
+}
+
+/* Download buttons (installers etc. dropped in the page folder). */
+.dl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 10px 0 2px;
+}
+
+.dllnk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+  border: 2px solid #fff;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.dllnk:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #e23a3a 0%, var(--red) 100%);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+.dllnk:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
 }
 
 /* ---- Windshield: now playing ----------------------------------------- */
@@ -1260,10 +1693,10 @@ a.tech-tag:hover {
 /* Word sitting inside the label box. */
 .flank-word {
   fill: #fff;
-  font-family: var(--mono);
-  font-size: 14px;
+  font-family: var(--display);
+  font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .flank-tri polygon,
@@ -1411,19 +1844,31 @@ a.tech-tag:hover {
   transform: translateX(-50%) translateY(0);
 }
 
+/* Skills (left) + tagline (centre) + Hobbies (right), sitting over the
+   circuit pockets either side of the tagline. */
+.cp-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3vw, 40px);
+  margin: 22px 0 16px;
+}
+
 .cp-tagline {
+  flex: none;
   font-size: 15px;
   color: var(--red-soft);
-  margin: 6px 0 14px;
+  margin: 0;
   line-height: 1.5;
   text-align: center;
 }
 
-/* Skills control: opens the categorised skills board in the windshield.
-   Matches the cockpit's buttons — inverts to white-on-red when active. */
-.cp-skills {
+/* Skills / Hobbies controls: open the categorised boards in the windshield.
+   Match the cockpit's buttons — invert to white-on-red when active. */
+.cp-tab {
   position: relative;
   z-index: 1;
+  flex: none;
   font-family: var(--display);
   font-size: 18px;
   font-weight: 700;
@@ -1435,7 +1880,6 @@ a.tech-tag:hover {
   border: 2px solid #fff;
   border-radius: 0;
   padding: 10px 18px;
-  margin: 0 0 16px;
   cursor: pointer;
   transition:
     transform 0.15s ease,
@@ -1447,7 +1891,7 @@ a.tech-tag:hover {
     inset 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
 
-.cp-skills:hover {
+.cp-tab:hover {
   transform: translateY(-2px);
   background: linear-gradient(180deg, #e23a3a 0%, var(--red) 100%);
   box-shadow:
@@ -1455,7 +1899,7 @@ a.tech-tag:hover {
     0 0 0 2px rgba(255, 255, 255, 0.55);
 }
 
-.cp-skills.on {
+.cp-tab.on {
   background: linear-gradient(180deg, #ffffff 0%, #f2f2f4 100%);
   color: var(--red);
   box-shadow:
@@ -1662,11 +2106,12 @@ a.tech-tag:hover {
     color 0.2s ease;
 }
 
-/* Title line on the button. */
+/* Title line on the button. Same display face as the Skills/Hobbies tabs. */
 .navitem-title {
-  font-family: var(--mono);
+  font-family: var(--display);
   font-size: 20px;
-  font-weight: 900;
+  font-weight: 700;
+  letter-spacing: 1px;
   text-transform: capitalize;
   line-height: 1.2;
 }

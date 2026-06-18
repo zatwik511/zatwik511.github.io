@@ -1,4 +1,4 @@
-import type { NowPlaying, SkillGroup, SocialLink } from './types'
+import type { HomeIntro, NowPlaying, SkillGroup, SocialLink } from './types'
 
 /**
  * Site-level identity that isn't tied to any single page: name, contact links,
@@ -15,8 +15,12 @@ export interface SiteConfig {
   /** Direct contact address for the email popup. */
   contactEmail: string
   socials: SocialLink[]
+  /** The welcome screen (shown on home). */
+  home: HomeIntro
   /** Categorised skills shown on the cockpit's Skills board. */
   skillGroups: SkillGroup[]
+  /** Categorised hobbies shown on the cockpit's Hobbies board. */
+  hobbyGroups: SkillGroup[]
   /** Fallback now-playing track until the live Spotify data loads. */
   nowPlaying: NowPlaying
 }
@@ -44,9 +48,9 @@ export const site: SiteConfig = {
     {
       label: 'Phone',
       icon: 'phone',
-      // TODO: replace with the real number.
-      hint: '+44 0000 000000',
-      action: { kind: 'copy', value: '+44 0000 000000' },
+      hint: '+44 7352 668970',
+      // tel: opens the dialler with the number prefilled on mobile.
+      action: { kind: 'tel', number: '+447352668970' },
     },
     {
       label: 'Email',
@@ -55,32 +59,87 @@ export const site: SiteConfig = {
       action: { kind: 'mailto', address: 'sa7wik@gmail.com' },
     },
   ],
+  // The welcome screen. Edit `intro` freely; drop a square (1:1) photo in
+  // public/ and set `photo` to its path (e.g. '/me.jpg') to replace the
+  // placeholder.
+  home: {
+    heading: 'Welcome aboard.',
+    intro:
+      "Hi, I'm Satwik, a full-stack software engineer who likes building polished, slightly over-engineered things (this cockpit included). Use the controls on the right to explore my education, experience, and projects, or see what I get up to off duty. This is placeholder text, edit it in src/content/site.ts.",
+    // Drop a 1:1 square image in public/ and point this at it, e.g. '/me.jpg'.
+    photo: '',
+  },
   // Add or reorder freely — each category renders as a row of chips on the
   // Skills board. Names that exist in skills.ts become clickable links.
   skillGroups: [
     {
-      heading: 'Languages & Frameworks',
+      heading: 'Languages',
+      items: ['Python', 'Java', 'C', 'C++', 'JavaScript', 'TypeScript', 'SQL', 'HTML/CSS'],
+    },
+    {
+      heading: 'Frameworks & Libraries',
       items: [
-        'Python',
-        'Java',
-        'C',
-        'C++',
-        'JavaScript',
-        'TypeScript',
         'React',
         'Node.js',
-        'SQL',
-        'HTML/CSS',
+        'Express',
+        'Flask',
+        'SQLAlchemy',
+        'Tailwind CSS',
+        'Bootstrap',
         'Three.js',
+        'Tkinter',
+        'Cornerstone.js',
+        'marked',
+        'PostgreSQL',
       ],
     },
     {
-      heading: 'AI Tools',
-      items: ['Claude', 'ChatGPT', 'Gemini', 'GitHub Copilot', 'DeepSeek', 'Perplexity'],
+      heading: 'AI & ML',
+      items: [
+        'llama.cpp',
+        'Phi-3 Mini',
+        'Whisper',
+        'Groq',
+        'Google Gemini',
+        'scikit-learn',
+        'Claude',
+        'ChatGPT',
+        'GitHub Copilot',
+        'DeepSeek',
+        'Perplexity',
+      ],
     },
     {
-      heading: 'Software',
-      items: ['Adobe Premiere Pro', 'Adobe Photoshop', 'MS Office', 'Git'],
+      heading: 'Cloud & DevOps',
+      items: [
+        'AWS EC2',
+        'AWS S3',
+        'Vercel',
+        'Render',
+        'GitHub Actions',
+        'Gunicorn',
+        'Caddy',
+        'Git',
+      ],
+    },
+    {
+      heading: 'Build & Tooling',
+      items: [
+        'Vite',
+        'CMake',
+        'MinGW-w64',
+        'MSYS2',
+        'PyInstaller',
+        'Inno Setup',
+        'nlohmann/json',
+        'JWT',
+        'Spotify API',
+        'Gmail API',
+      ],
+    },
+    {
+      heading: 'Creative & Office',
+      items: ['Adobe Premiere Pro', 'Adobe Photoshop', 'MS Office'],
     },
     {
       heading: 'Professional',
@@ -90,6 +149,34 @@ export const site: SiteConfig = {
         'Communication',
         'Attention to Detail',
       ],
+    },
+  ],
+  // Categorised hobbies shown on the cockpit's Hobbies board. Plain chips
+  // (no links) — edit freely; each category renders as a row.
+  hobbyGroups: [
+    {
+      heading: 'Physical & Sports',
+      items: ['Gym', 'Table Tennis', 'Football', 'Dancing'],
+    },
+    {
+      heading: 'Creative & Artistic',
+      items: ['Singing', 'Guitar', 'Photography', 'Cooking'],
+    },
+    {
+      heading: 'Cognitive & Intellectual',
+      items: ['Coding', 'Reading', 'Physics', 'Philosophy', 'AI'],
+    },
+    {
+      heading: 'Collection & Curation',
+      items: ['CD Album Collecting', 'Comics'],
+    },
+    {
+      heading: 'Observation & Entertainment',
+      items: ['YouTube', 'Watching Sports', 'Movies', 'TV', 'Anime', 'Comedy'],
+    },
+    {
+      heading: 'Tech & Exploration',
+      items: ['PC Building', 'Gaming', 'Travel'],
     },
   ],
   nowPlaying: {

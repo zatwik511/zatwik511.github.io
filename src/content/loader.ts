@@ -23,6 +23,7 @@
 import { marked } from 'marked'
 import { parseFrontmatter, type Frontmatter } from './frontmatter'
 import type {
+  DownloadFile,
   Entry,
   EntryKind,
   ExternalLink,
@@ -55,6 +56,19 @@ const MEDIA = import.meta.glob(
   '/pages/**/*.{png,jpg,jpeg,webp,avif,gif,svg,mp4,webm,mov,m4v,ogv}',
   { import: 'default', eager: true },
 ) as Record<string, string>
+
+// Downloadable files (installers, archives) dropped in a page folder.
+const DOWNLOADS = import.meta.glob('/pages/**/*.{exe,msi,zip,dmg,appimage,deb,apk}', {
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+// Certificate PDFs dropped in a page folder (opened in a new tab).
+const CERTS = import.meta.glob('/pages/**/*.pdf', {
+  import: 'default',
+  eager: true,
+  query: '?url',
+}) as Record<string, string>
 
 /** kebab-case slug used for the entry id, deep links, and 3D node names. */
 function slug(name: string): string {
@@ -95,6 +109,37 @@ function mediaFor(section: string, item: string): ProjectMedia[] {
         src: MEDIA[p],
         caption: captionFromFile(file),
       } satisfies ProjectMedia
+    })
+}
+
+/** Friendly button label for a downloadable file, by extension. */
+function downloadLabel(ext: string): string {
+  if (ext === 'exe' || ext === 'msi') return 'Download installer'
+  if (ext === 'dmg') return 'Download for macOS'
+  if (ext === 'deb' || ext === 'appimage') return 'Download for Linux'
+  if (ext === 'apk') return 'Download for Android'
+  return 'Download'
+}
+
+/** The certificate PDF (if any) in one item folder; opened in a new tab. */
+function certFor(section: string, item: string): string | undefined {
+  const prefix = `/pages/${section}/${item}/`
+  const key = Object.keys(CERTS)
+    .filter((p) => p.startsWith(prefix))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))[0]
+  return key ? CERTS[key] : undefined
+}
+
+/** Collect downloadable files living in one item folder. */
+function downloadsFor(section: string, item: string): DownloadFile[] {
+  const prefix = `/pages/${section}/${item}/`
+  return Object.keys(DOWNLOADS)
+    .filter((p) => p.startsWith(prefix))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((p) => {
+      const filename = p.slice(prefix.length)
+      const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+      return { label: downloadLabel(ext), url: DOWNLOADS[p], filename }
     })
 }
 
@@ -165,6 +210,8 @@ function buildEntry(section: string, item: string, kind: EntryKind): Entry | nul
   const html = body ? (marked.parse(body) as string) : ''
   const media = mediaFor(section, item)
   const links = parseLinks(data)
+  const downloads = downloadsFor(section, item)
+  const certificateUrl = certFor(section, item)
   const universe = parseUniverse(data)
   const id = str(data, 'id') ?? slug(item)
 
@@ -178,6 +225,8 @@ function buildEntry(section: string, item: string, kind: EntryKind): Entry | nul
     title,
     ...(media.length ? { media } : {}),
     ...(links.length ? { links } : {}),
+    ...(downloads.length ? { downloads } : {}),
+    ...(certificateUrl ? { certificateUrl } : {}),
     ...(universe ? { universe } : {}),
   }
 
@@ -213,6 +262,57 @@ function itemsIn(section: string): string[] {
 /** Numeric `order` front-matter, falling back to a large number (sorts last). */
 function orderOf(entry: Entry): number {
   return typeof entry.order === 'number' ? entry.order : Number.MAX_SAFE_INTEGER
+}
+
+/** A welcome-screen photo: its lowercased base filename (for matching
+ *  `primary` / `secondary`) plus the bundled asset URL. */
+export interface HomePhoto {
+  name: string
+  src: string
+}
+
+/**
+ * Images dropped into `pages/Home/` (the welcome-screen photo). Not a nav
+ * section — it just feeds the home page. Videos are ignored; sorted
+ * numerically so a `01-…`, `02-…` prefix controls order.
+ */
+export function loadHomePhotos(): HomePhoto[] {
+  const prefix = '/pages/Home/'
+  return Object.keys(MEDIA)
+    .filter((p) => {
+      if (!p.startsWith(prefix)) return false
+      const ext = p.split('.').pop()?.toLowerCase() ?? ''
+      return !VIDEO_EXT.has(ext)
+    })
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((p) => ({
+      name: (p.split('/').pop() ?? '').replace(/\.[^.]+$/, '').toLowerCase(),
+      src: MEDIA[p],
+    }))
+}
+
+/** Welcome-screen text, authored in the markdown file in pages/Home/. */
+export interface HomeContent {
+  heading: string
+  introHtml: string
+}
+
+/**
+ * Read the welcome-screen text from the markdown file sitting directly in
+ * pages/Home/ (e.g. README.md): front-matter `heading:` and the body as the
+ * intro paragraph (markdown). Returns null if there's no such file.
+ */
+export function loadHome(): HomeContent | null {
+  const key = Object.keys(MD).find((p) => {
+    const seg = p.split('/').filter(Boolean) // ['pages','Home','file.md']
+    return seg.length === 3 && seg[1] === 'Home'
+  })
+  if (!key) return null
+  const { data, body } = parseFrontmatter(MD[key])
+  return {
+    heading: str(data, 'heading') ?? str(data, 'title') ?? '',
+    introHtml: body ? (marked.parse(body) as string) : '',
+  }
 }
 
 /** Assemble the cockpit nav groups straight from the content folders. */

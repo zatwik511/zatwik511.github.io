@@ -3,8 +3,22 @@ export { skillUrl } from './skills'
 export { site } from './site'
 
 import { site } from './site'
-import { loadGroups } from './loader'
+import {
+  loadGroups,
+  loadHome,
+  loadHomePhotos,
+  type HomeContent,
+  type HomePhoto,
+} from './loader'
 import type { Entry, Profile } from './types'
+
+export type { HomePhoto, HomeContent }
+
+/** Photos dropped in pages/Home/ (welcome-screen picture); [] if none. */
+export const homePhotos: HomePhoto[] = loadHomePhotos()
+
+/** Welcome-screen text from the markdown file in pages/Home/; null if none. */
+export const homeContent: HomeContent | null = loadHome()
 
 /**
  * The full profile the UI renders: site identity (site.ts) stitched together
