@@ -2332,61 +2332,55 @@ a.tech-tag:hover {
   color: #ffd6d6;
 }
 
-/* ---- Mobile: stack the two panels, each a full screen ----------------- *
- * The desktop layout is two square-ish panels side by side (16:9). On phones
- * (9:16) the SAME two panels stack vertically, each filling one screen, and
- * the page scrolls from the windshield down to the cockpit. This block lives
+/* ---- Mobile: the two panels split the screen 50/50 vertically --------- *
+ * The desktop layout is two panels side by side (16:9). On phones (9:16) the
+ * SAME two panels just rotate to stack: windshield = top half, cockpit =
+ * bottom half, each keeping its layout and its own inner scroll. This block is
  * at the end of the file so it overrides every base rule above it. */
 @media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
-  /* Let the page scroll through the two stacked screens. */
-  html,
-  body,
-  #root {
-    height: auto;
-    min-height: 100%;
-  }
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
   .deck {
     flex-direction: column;
-    height: auto;
-    min-height: 100dvh;
   }
-
-  /* Each panel is one full screen, keeping its desktop layout + inner scroll. */
-  .windshield {
-    flex: none;
-    height: 100dvh;
-  }
+  /* .windshield / .cockpit keep flex: 1, so each takes half the screen. */
   .cockpit {
-    flex: none;
-    height: 100dvh;
     border-left: none;
     border-top: 2px solid var(--red-line);
   }
 
-  /* Windshield content starts below the now-playing widget so the heading
-     never sits under it (the corner-reserving float isn't needed on mobile). */
+  /* Windshield content clears the now-playing widget (the corner-reserving
+     float isn't needed on mobile). */
   .ws-widget-spacer {
     display: none;
   }
   .ws-scroll {
-    padding-top: 92px;
-  }
-  .ws-np-corner {
-    top: 14px;
-    right: 14px;
-  }
-  .np {
-    max-width: 210px;
+    padding-top: 70px;
   }
   .ws-head {
     font-size: clamp(28px, 8vw, 42px);
   }
   .ws-meta {
     font-size: clamp(17px, 5vw, 24px);
+  }
+
+  /* Smaller now-playing widget so it doesn't dominate the half-height panel. */
+  .ws-np-corner {
+    top: 12px;
+    right: 12px;
+  }
+  .np {
+    max-width: 168px;
+    gap: 9px;
+    padding: 8px 10px 7px;
+  }
+  .np-art {
+    width: 44px;
+    height: 44px;
+  }
+  .np-title span {
+    font-size: 16px;
+  }
+  .np-artist {
+    font-size: 13px;
   }
 
   /* Scale the header pieces down for narrow widths. */
@@ -2403,8 +2397,8 @@ a.tech-tag:hover {
   /* Tagline on its own line; Skills / Hobbies side by side beneath it. */
   .cp-controls {
     flex-wrap: wrap;
-    gap: 12px;
-    margin: 14px 0;
+    gap: 10px;
+    margin: 12px 0;
   }
   .cp-tagline {
     flex-basis: 100%;

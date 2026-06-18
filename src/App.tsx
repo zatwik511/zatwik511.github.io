@@ -36,10 +36,6 @@ export function App() {
     // Drop the hover preview so the freshly fetched page (and its warp-in)
     // shows immediately, even while the cursor is still on the button.
     setPreview(null)
-    // On mobile the controls sit below the windshield, so scroll back up to
-    // the display to reveal the page that was just loaded. (No-op on desktop,
-    // where the page itself doesn't scroll.)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   // Resolved fresh every render (not memoised) so editing a page's markdown
