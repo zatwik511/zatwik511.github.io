@@ -405,93 +405,9 @@ button {
   z-index: 1;
 }
 
-/* Phone (portrait): windshield on top, cockpit below, horizontal seam. */
-@media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
-  /* On phones the two panels stack and the PAGE scrolls, instead of being
-     squeezed into two fixed half-height panels that scroll independently. */
-  html,
-  body,
-  #root {
-    height: auto;
-    min-height: 100%;
-  }
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .deck {
-    flex-direction: column;
-    height: auto;
-    min-height: 100dvh;
-  }
-
-  /* Windshield: a hero on top that grows with its content. */
-  .windshield {
-    flex: none;
-    min-height: 72vh;
-  }
-  .ws-scroll {
-    overflow-y: visible;
-  }
-  .ws-head {
-    font-size: clamp(28px, 8vw, 42px);
-  }
-  .ws-meta {
-    font-size: clamp(17px, 5vw, 24px);
-  }
-  .ws-widget-spacer {
-    width: min(190px, 44%);
-    height: 84px;
-  }
-  .ws-np-corner {
-    top: 14px;
-    right: 14px;
-  }
-  .np {
-    max-width: 210px;
-    padding: 10px 12px 9px;
-  }
-
-  /* Cockpit: natural height below; the page (not the panel) scrolls. */
-  .cockpit {
-    flex: none;
-    overflow-y: visible;
-    border-left: none;
-    border-top: 2px solid var(--red-line);
-  }
-  .nav-deck,
-  .nav-group,
-  .nav-items {
-    flex: none;
-    min-height: 0;
-  }
-  .nav-items {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* Shrink oversized header pieces for narrow screens. */
-  .cp-name {
-    font-size: clamp(24px, 7vw, 38px);
-  }
-  .cp-name-row {
-    gap: 12px;
-  }
-  .cp-flank {
-    width: clamp(62px, 19vw, 92px);
-    height: clamp(76px, 23vw, 110px);
-  }
-  /* Tagline on its own line; Skills / Hobbies side by side beneath it. */
-  .cp-controls {
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 16px 0;
-  }
-  .cp-tagline {
-    flex-basis: 100%;
-    order: -1;
-  }
-}
+/* Phone: the desktop's two side-by-side panels stack vertically, each a full
+   screen. See the consolidated mobile block at the END of this file (it must
+   come after every base rule to win the cascade). */
 
 /* ---- HUD micro-label -------------------------------------------------- */
 
@@ -2414,6 +2330,91 @@ a.tech-tag:hover {
 
 .modal-status-err {
   color: #ffd6d6;
+}
+
+/* ---- Mobile: stack the two panels, each a full screen ----------------- *
+ * The desktop layout is two square-ish panels side by side (16:9). On phones
+ * (9:16) the SAME two panels stack vertically, each filling one screen, and
+ * the page scrolls from the windshield down to the cockpit. This block lives
+ * at the end of the file so it overrides every base rule above it. */
+@media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
+  /* Let the page scroll through the two stacked screens. */
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+  }
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .deck {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  /* Each panel is one full screen, keeping its desktop layout + inner scroll. */
+  .windshield {
+    flex: none;
+    height: 100dvh;
+  }
+  .cockpit {
+    flex: none;
+    height: 100dvh;
+    border-left: none;
+    border-top: 2px solid var(--red-line);
+  }
+
+  /* Windshield content starts below the now-playing widget so the heading
+     never sits under it (the corner-reserving float isn't needed on mobile). */
+  .ws-widget-spacer {
+    display: none;
+  }
+  .ws-scroll {
+    padding-top: 92px;
+  }
+  .ws-np-corner {
+    top: 14px;
+    right: 14px;
+  }
+  .np {
+    max-width: 210px;
+  }
+  .ws-head {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+  .ws-meta {
+    font-size: clamp(17px, 5vw, 24px);
+  }
+
+  /* Scale the header pieces down for narrow widths. */
+  .cp-name {
+    font-size: clamp(24px, 7vw, 38px);
+  }
+  .cp-name-row {
+    gap: 12px;
+  }
+  .cp-flank {
+    width: clamp(62px, 19vw, 92px);
+    height: clamp(76px, 23vw, 110px);
+  }
+  /* Tagline on its own line; Skills / Hobbies side by side beneath it. */
+  .cp-controls {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .cp-tagline {
+    flex-basis: 100%;
+    order: -1;
+  }
+
+  /* Two columns of nav buttons reads better than three on a phone. */
+  .nav-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
