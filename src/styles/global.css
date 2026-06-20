@@ -2472,7 +2472,7 @@ a.tech-tag:hover {
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 14px;
+    top: 9px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 30;
@@ -2500,9 +2500,10 @@ a.tech-tag:hover {
      panel) but scale every piece to a phone's width so nothing clips, overflows,
      or collides. The vertical flex-fill is inherited from desktop. --- */
   .cockpit {
-    /* Extra top room for the centred "back" triangle above the name. */
-    padding: 74px 14px 22px;
-    gap: 10px;
+    /* Top room for the centred "back" triangle; kept tight so the rectangle
+       below gets more height. */
+    padding: 64px 14px 20px;
+    gap: 7px;
     /* Belt-and-braces: never let a child spill sideways past the panel. */
     overflow-x: hidden;
   }
@@ -2535,7 +2536,7 @@ a.tech-tag:hover {
     padding: 9px 13px;
   }
   .cp-header {
-    gap: 7px;
+    gap: 5px;
   }
   .cp-socials {
     gap: 20px;
@@ -2548,7 +2549,7 @@ a.tech-tag:hover {
   .cp-controls {
     flex-wrap: wrap;
     gap: 10px 22px;
-    margin: 4px 0 8px;
+    margin: 2px 0 5px;
   }
   .cp-tagline {
     flex-basis: 100%;
@@ -2617,8 +2618,8 @@ a.tech-tag:hover {
   }
   .navitem {
     min-width: 0;
-    min-height: 52px;
-    padding: 8px 5px;
+    min-height: 64px;
+    padding: 10px 5px;
     gap: 3px;
     overflow: hidden;
   }
@@ -2723,6 +2724,23 @@ a.tech-tag:hover {
      content scrolls clear of the cockpit triangle. */
   .ws-scroll {
     padding: 24px 26px 108px;
+    /* Keep scrolling content INSIDE the white triangle frame: fade it out as it
+       reaches the top border and the bottom (above the cockpit triangle) instead
+       of letting it overflow past them. */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 20px,
+      #000 calc(100% - 74px),
+      transparent calc(100% - 52px)
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 20px,
+      #000 calc(100% - 74px),
+      transparent calc(100% - 52px)
+    );
   }
   /* The desktop float spacer isn't used; the heading reserves the badge corner
      itself (see .ws-head::before below). */
