@@ -223,11 +223,13 @@ function CertCard({ url }: { url: string }) {
   )
 }
 
-/** The "open ↗" link buttons, shared by every page kind. */
-function Links({ entry }: { entry: Entry }) {
+/** The "open ↗" link buttons, shared by every page kind. The optional
+ *  className lets the same links render as an overlay inside the photo on
+ *  mobile (see the `link-fig` copy in the education/experience branch). */
+function Links({ entry, className = '' }: { entry: Entry; className?: string }) {
   if (!entry.links || entry.links.length === 0) return null
   return (
-    <div className="link-row">
+    <div className={`link-row ${className}`.trim()}>
       {entry.links.map((l, i) => (
         <a
           className="openlnk"
@@ -255,7 +257,7 @@ export function EntryContent({ entry }: { entry: Entry | null }) {
   } else if (entry.kind === 'project') {
     content = (
       <>
-        <span className="ml ws-hud">{entry.summary}</span>
+        <span className="ml ws-hud ws-hud-intro">{entry.summary}</span>
         <div className="ws-head">{entry.title}</div>
 
         <MediaRow entry={entry} onPreview={setPreview} />
@@ -301,6 +303,12 @@ export function EntryContent({ entry }: { entry: Entry | null }) {
             {entry.media.map((m, i) => (
               <PlainMedia m={m} key={i} />
             ))}
+            {/* MOBILE ONLY, EDUCATION ONLY: links overlaid in the photo's corner
+                (hidden on desktop; the normal link-row below is hidden on mobile
+                only on these pages). Experience pages keep the link below. */}
+            {entry.kind === 'education' && (
+              <Links entry={entry} className="link-fig" />
+            )}
           </div>
         )}
         {(!entry.media || entry.media.length === 0) && entry.certificateUrl && (

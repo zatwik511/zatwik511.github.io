@@ -1166,6 +1166,12 @@ button {
   object-fit: contain;
 }
 
+/* The in-photo links copy only appears on mobile (see the mobile block); on
+   desktop the normal link-row below the heading is used instead. */
+.link-fig {
+  display: none;
+}
+
 /* Certificate box, floated top-right like the figure (text wraps around it). */
 .cert-card {
   float: right;
@@ -1464,6 +1470,12 @@ a.tech-tag:hover {
 .np:hover {
   background: rgba(95, 18, 18, 0.55);
   border-color: var(--red);
+}
+
+/* The collapse-to-logo button is mobile-only; on desktop the full widget always
+   shows (the mobile block reveals the logo and the tap-to-expand popup). */
+.np-logo {
+  display: none;
 }
 
 .np-info {
@@ -2328,161 +2340,713 @@ a.tech-tag:hover {
   color: #ffd6d6;
 }
 
-/* ---- Mobile: the two panels split the screen 50/50 vertically --------- *
- * The desktop layout is two panels side by side (16:9). On phones (9:16) the
- * SAME two panels just rotate to stack: windshield = top half, cockpit =
- * bottom half, each keeping its layout and its own inner scroll. This block is
- * at the end of the file so it overrides every base rule above it. */
+/* Mobile-only controls (the glowing triangle that summons the cockpit, and the
+   "DISPLAY" back tab on the cockpit). Hidden on desktop, where both panels are
+   shown side by side and there's nothing to toggle. The mobile block below
+   reveals them. */
+.ws-enter,
+.cp-back {
+  display: none;
+}
+
+/* ---- Mobile: a two-SCREEN flow (windshield ⇄ cockpit) ----------------- *
+ * Desktop is two panels side by side (16:9). On a phone (9:16) that doesn't
+ * reflow well — each panel is too short. Instead we treat them as two full
+ * screens: the windshield is home base, a glowing cue summons the cockpit, and
+ * tapping a cockpit control crossfades back to the windshield to reveal what it
+ * loaded. Only one panel is on screen at a time, so each gets the FULL viewport
+ * (no cramming). This block is last in the file so it overrides the base
+ * rules above it. */
 @media (max-aspect-ratio: 1 / 1), (max-width: 760px) {
+  /* Stage: a single viewport-sized box; the two panels stack on top of each
+     other and crossfade. */
   .deck {
-    flex-direction: column;
-  }
-  /* .windshield / .cockpit keep flex: 1, so each takes half the screen. */
-  .cockpit {
-    border-left: none;
-    border-top: 2px solid var(--red-line);
-    gap: 8px;
-    padding: 12px;
-  }
-
-  /* --- Windshield (top half) --- */
-  /* Content clears the now-playing widget (corner float not needed here). */
-  .ws-widget-spacer {
-    display: none;
-  }
-  .ws-scroll {
-    padding: 58px 18px 14px;
-  }
-  .ws-head {
-    font-size: clamp(22px, 6.5vw, 32px);
-  }
-  .ws-meta {
-    font-size: clamp(15px, 4.4vw, 21px);
-  }
-  .ws-home {
-    gap: 10px;
-  }
-  .ws-home-photo {
-    width: clamp(110px, 28vw, 168px);
-  }
-  .ws-home-intro {
-    font-size: 14px;
-    line-height: 1.45;
-  }
-  .ws-launch-bar {
-    padding: 4px 12px 12px;
-  }
-  .launch-tri {
-    width: 40px;
-    height: 34px;
-  }
-  .launch-label {
-    font-size: 12px;
-  }
-
-  /* Smaller now-playing widget, properly clipped so it never spills wide. */
-  .ws-np-corner {
-    top: 10px;
-    right: 10px;
-  }
-  .np {
-    max-width: 150px;
-    gap: 8px;
-    padding: 6px 8px 5px;
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100dvh;
     overflow: hidden;
   }
-  .np-info {
-    min-width: 0;
-  }
-  .np-art {
-    width: 38px;
-    height: 38px;
-  }
-  .np-title span {
-    font-size: 14px;
-  }
-  .np-artist {
-    font-size: 11px;
-  }
-  .np-label {
-    font-size: 11px;
-  }
-
-  /* --- Cockpit (bottom half) --- */
-  /* Nav sizes naturally (no flex squish → no overlapping headings) and the
-     desktop 3-up grid is kept so each section is a single short row. */
-  .nav-deck,
-  .nav-group,
-  .nav-items {
-    flex: none;
-    min-height: 0;
-  }
-
+  .windshield,
   .cockpit {
-    padding: 10px;
-    gap: 6px;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    /* Crossfade between panels. */
+    transition: opacity 420ms ease;
   }
-  .cp-header {
-    gap: 4px;
+  /* The cockpit sits on top in DOM order; show exactly one panel at a time and
+     make the hidden one non-interactive. */
+  .deck.panel-windshield .cockpit {
+    opacity: 0;
+    pointer-events: none;
   }
-  .cp-name {
-    font-size: clamp(18px, 5.5vw, 28px);
-    padding: 5px 12px;
+  .deck.panel-cockpit .windshield {
+    opacity: 0;
+    pointer-events: none;
   }
-  .cp-name-row {
+
+  /* --- Cockpit summon: powers on element by element each time it appears. --- */
+  .deck.panel-cockpit .cp-screen {
+    animation: boot-crt-on 0.55s linear;
+  }
+  .deck.panel-cockpit .cp-header {
+    animation: boot-rise 0.4s ease 0.12s backwards;
+  }
+  .deck.panel-cockpit .cp-controls {
+    animation: boot-rise 0.4s ease 0.22s backwards;
+  }
+  .deck.panel-cockpit .nav-deck .nav-group:nth-child(1) {
+    animation: boot-rise 0.4s ease 0.3s backwards;
+  }
+  .deck.panel-cockpit .nav-deck .nav-group:nth-child(2) {
+    animation: boot-rise 0.4s ease 0.4s backwards;
+  }
+  .deck.panel-cockpit .nav-deck .nav-group:nth-child(3) {
+    animation: boot-rise 0.4s ease 0.5s backwards;
+  }
+
+  /* --- Boot: on mobile the windshield is what's visible, so power it on right
+     away (the cockpit's boot sequence is hidden until summoned). --- */
+  .deck.booting .ws-screen {
+    animation: boot-screen-out 0.6s ease 0.2s both;
+  }
+  .deck.booting .ws-border,
+  .deck.booting .ws-rule {
+    animation-delay: 0.8s;
+  }
+  .deck.booting .ws-np-corner,
+  .deck.booting .launch {
+    animation-delay: 1.2s;
+  }
+  .deck.booting .ws-scroll {
+    animation-delay: 1.55s;
+  }
+
+  /* --- Hover affordances don't exist on touch: drop the preview overlay. --- */
+  .ws-preview {
+    display: none !important;
+  }
+
+  /* --- No Launch 3D on mobile; the glowing triangle below replaces it. --- */
+  .ws-launch-bar {
+    display: none;
+  }
+
+  /* --- Glowing downward triangle: summons the cockpit. Pinned just inside the
+     bottom edge of the windshield, centred. No label — it just pulses. --- */
+  .ws-enter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 30;
+    width: 64px;
+    height: 52px;
+    background: none;
+    border: none;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* The triangle itself (points down), drawn with borders. */
+  .ws-enter-tri {
+    width: 0;
+    height: 0;
+    border-left: 26px solid transparent;
+    border-right: 26px solid transparent;
+    border-top: 34px solid var(--red-line);
+    animation: enter-glow 1.9s ease-in-out infinite;
+  }
+  .ws-enter:active .ws-enter-tri {
+    border-top-color: #fff;
+  }
+
+  /* --- White glowing triangle (points UP): back to the windshield. Mirrors the
+     windshield's red down-triangle. Top-centre of the cockpit. --- */
+  .cp-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    width: 64px;
+    height: 52px;
+    background: none;
+    border: none;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cp-back-tri {
+    width: 0;
+    height: 0;
+    border-left: 26px solid transparent;
+    border-right: 26px solid transparent;
+    border-bottom: 34px solid #fff;
+    animation: back-glow 1.9s ease-in-out infinite;
+  }
+  .cp-back:active .cp-back-tri {
+    border-bottom-color: var(--red-line);
+  }
+
+  /* --- Cockpit: full-screen on mobile. Keep the PC structure (name + MESSAGE/CV
+     flanks, socials, Skills/tagline/Hobbies, the white nav rectangle filling the
+     panel) but scale every piece to a phone's width so nothing clips, overflows,
+     or collides. The vertical flex-fill is inherited from desktop. --- */
+  .cockpit {
+    /* Extra top room for the centred "back" triangle above the name. */
+    padding: 74px 14px 22px;
     gap: 10px;
+    /* Belt-and-braces: never let a child spill sideways past the panel. */
+    overflow-x: hidden;
+  }
+
+  /* Header: keep the MESSAGE / CV flank triangles a good readable size (their
+     label is SVG text that scales with the triangle, so bigger triangle = bigger
+     word) while still fitting the row. */
+  .cp-name-row {
+    gap: 5px;
   }
   .cp-flank {
-    width: clamp(48px, 15vw, 72px);
-    height: clamp(58px, 18vw, 86px);
+    width: clamp(62px, 17.5vw, 82px);
+    height: clamp(74px, 21vw, 98px);
+  }
+  .cp-flank-left {
+    top: 11px;
+  }
+  .cp-flank-right {
+    top: -11px;
+  }
+  .flank-word {
+    font-size: 14px;
+  }
+  /* "MESSAGE" is a longer word than "CV", so nudge just the left one down a hair. */
+  .cp-flank-left .flank-word {
+    font-size: 12.5px;
+  }
+  .cp-name {
+    font-size: clamp(20px, 5.6vw, 27px);
+    padding: 9px 13px;
+  }
+  .cp-header {
+    gap: 7px;
   }
   .cp-socials {
-    gap: 16px;
+    gap: 20px;
   }
-  /* Tagline on its own line; Skills / Hobbies side by side beneath it. */
+
+  /* Controls: put the tagline on its own line with Skills + Hobbies side by side
+     beneath it, so the row can never overflow (was clipping "ILLS"/"HOBBI").
+     A wide gap separates the two buttons (the colliding circuit pockets behind
+     them are hidden on mobile — see .decor-pockets below). */
   .cp-controls {
     flex-wrap: wrap;
-    gap: 6px;
-    margin: 6px 0;
+    gap: 10px 22px;
+    margin: 4px 0 8px;
   }
   .cp-tagline {
     flex-basis: 100%;
     order: -1;
-    font-size: 12px;
+    font-size: 14px;
   }
   .cp-tab {
-    font-size: 13px;
-    padding: 6px 12px;
-    letter-spacing: 1px;
+    font-size: 16px;
+    padding: 9px 22px;
+    letter-spacing: 1.5px;
   }
 
+  /* The circuit pockets are the "main attraction" beside the contact links:
+     enlarge them and sit them in the socials band, clear of the name above and
+     the Skills/Hobbies buttons below. Two knobs:
+       translateY → up (more negative) / down
+       scale      → size (transform-box:fill-box scales about their own centre) */
+  /* Pockets: vertical position on the parent; each side pushed out toward its
+     border + shrunk on its own group. Knobs: translateX (push to border, don't
+     let it touch), scale (size), and the parent translateY (up/down). */
+  .decor-pockets {
+    transform: translateY(-6px);
+  }
+  .decor-pocket-l {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: translateX(-42px) scale(0.8);
+  }
+  .decor-pocket-r {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: translateX(42px) scale(0.8);
+  }
+  /* Drop the small greeble squares that sat with the pockets. */
+  .decor-pocket-sq {
+    display: none;
+  }
+  /* Remove the top corner brackets on mobile (they crowd the name). */
+  .decor-top-corners {
+    display: none;
+  }
+  /* No cursor on touch, so the cursor-follow glow never fires — drop its mask so
+     the WHOLE decoration glows instead of only a spot under the pointer. */
+  .hull-decor-glow {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  /* Nav rectangle: tighter spacing, and the 3-up cards now SHRINK to fit
+     (min-width:0) instead of overflowing the panel. Sizes scaled down to match.
+     overflow:hidden on a card clips a long blurb inside its own box rather than
+     letting it spill onto the section below. */
   .nav-deck {
-    padding: 8px;
-    gap: 6px;
+    padding: 12px;
+    gap: 12px;
   }
   .nav-group {
-    gap: 4px;
+    gap: 8px;
   }
   .nav-group-heading {
-    font-size: 15px;
+    font-size: 17px;
     letter-spacing: 1px;
   }
   .nav-items {
-    gap: 6px;
+    gap: 7px;
   }
   .navitem {
-    min-height: 40px;
-    padding: 5px 6px;
+    min-width: 0;
+    min-height: 52px;
+    padding: 8px 5px;
+    gap: 3px;
+    overflow: hidden;
   }
   .navitem-title {
-    font-size: 12.5px;
+    font-size: clamp(13px, 3.8vw, 16px);
+    letter-spacing: 0.3px;
   }
   .navitem-blurb {
-    font-size: 9.5px;
-    line-height: 1.15;
+    font-size: clamp(10px, 2.8vw, 12px);
+    line-height: 1.22;
   }
-  .nav-dots {
+
+  /* --- Now-playing: collapsed to just the Spotify logo so it never crowds the
+     headings. Tapping the logo expands the full widget as a popup; tapping
+     anywhere else (the .np-backdrop) collapses it again. --- */
+  .ws-np-corner {
+    top: 26px;
+    right: 26px;
+    z-index: 3;
+  }
+  /* Collapsed state: a big tappable Spotify logo. */
+  .np-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 1.5px solid rgba(29, 185, 84, 0.5);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--spotify);
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 2px 9px rgba(0, 0, 0, 0.45);
+  }
+  /* Hide the full widget while collapsed. */
+  .ws-np-corner .np {
+    display: none;
+  }
+  /* Full-screen catcher behind the popup. */
+  .np-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    background: transparent;
+  }
+  /* Expanded: lift the corner above the backdrop, swap the logo for the widget. */
+  .ws-np-corner.np-open {
+    z-index: 50;
+  }
+  .ws-np-corner.np-open .np-logo {
+    display: none;
+  }
+  .ws-np-corner.np-open .np {
+    display: flex;
+    max-width: 244px;
+    gap: 10px;
+    padding: 8px 10px 7px;
+    overflow: hidden;
+    background: rgba(10, 6, 6, 0.94);
+    border-color: var(--red);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.6);
+    transform-origin: top right;
+    animation: np-pop 0.18s ease-out;
+  }
+  .np-info {
+    min-width: 0;
+  }
+  .ws-np-corner.np-open .np-art {
+    width: 44px;
+    height: 44px;
+  }
+  .ws-np-corner.np-open .np-title span {
+    font-size: 14px;
+  }
+  .ws-np-corner.np-open .np-artist,
+  .ws-np-corner.np-open .np-label {
+    font-size: 12px;
+  }
+
+  /* --- Tapping the triangle lights the whole frame red (the desktop Launch 3D
+     hover flood, made tap-driven). --- */
+  .windshield.launch-lit .ws-border {
+    filter: drop-shadow(0 0 4px rgba(255, 45, 45, 0.95))
+      drop-shadow(0 0 11px rgba(225, 30, 30, 0.8));
+  }
+  .windshield.launch-lit .ws-border i {
+    background-image: var(--tri-red);
+    opacity: 1;
+  }
+  .windshield.launch-lit .ws-border i:first-child {
+    animation: none;
+    filter: none;
+  }
+
+  /* --- Detail pages (Education / Experience / Projects): one full-width column.
+     On desktop the photo floats top-right and the heading wraps beside it; on a
+     phone that squeezes the heading into a narrow strip. So here we stack
+     everything in a single column — heading + meta span the FULL width at the
+     top, then the photo drops to a centred block below the title. Content starts
+     below the now-playing badge so nothing overlaps it, with a big bottom gap so
+     content scrolls clear of the cockpit triangle. */
+  .ws-scroll {
+    padding: 24px 26px 108px;
+  }
+  /* The desktop float spacer isn't used; the heading reserves the badge corner
+     itself (see .ws-head::before below). */
+  .ws-widget-spacer {
+    display: none;
+  }
+  /* Single column + explicit order so the photo lands after the title/meta
+     instead of floating beside the heading. */
+  .ws-page:has(.ws-head) {
+    display: flex;
+    flex-direction: column;
+  }
+  .ws-page:has(.ws-head) > * {
+    order: 5;
+  }
+  .ws-page:has(.ws-head) > .ws-hud {
+    order: 1;
+  }
+  .ws-page:has(.ws-head) > .ws-head {
+    order: 2;
+  }
+  .ws-page:has(.ws-head) > .ws-meta {
+    order: 3;
+  }
+  /* Photo / certificate box: un-float and centre it under the title. */
+  .ws-page:has(.ws-head) > .ws-figure,
+  .ws-page:has(.ws-head) > .cert-card {
+    order: 4;
+    float: none;
+    clear: none;
+    width: min(240px, 74%);
+    margin: 4px auto 4px;
+  }
+  /* Pull the body text right up under the photo. */
+  .ws-page:has(.ws-head) > .ws-body {
     margin-top: 2px;
+  }
+  /* "Visit Website" moves INTO the photo's bottom-right corner — ONLY on the
+     education pages (School / Bachelor's / Master's), which are the only ones
+     that render a `.link-fig` copy. Hide the normal link-row just there; every
+     other page keeps its link below the heading. */
+  .ws-page:has(.link-fig) > .link-row {
+    display: none;
+  }
+  .ws-figure {
+    position: relative;
+  }
+  .ws-figure .link-fig {
+    display: flex;
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    margin: 0;
+    z-index: 2;
+  }
+  .ws-figure .link-fig .openlnk {
+    font-size: 12px;
+    padding: 5px 11px;
+    background: linear-gradient(180deg, var(--red) 0%, var(--red-deep) 100%);
+    border: 1.5px solid #fff;
+    color: #fff;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+  /* Reserve the now-playing badge's corner INSIDE the heading: the title text
+     wraps to the left of the badge for its top line(s), then flows full-width
+     below it. This lets the heading sit high (beside the badge) without ever
+     touching it. Adjust width/height if the badge size changes. */
+  .ws-page:has(.ws-head) > .ws-head::before {
+    content: '';
+    float: right;
+    width: 72px; /* logo width + gap → how far the top line(s) stay clear */
+    /* Tall enough that the heading box always ends BELOW the logo, so the red
+       meta line beneath it can't climb up beside the logo and touch it. */
+    height: 52px;
+  }
+  .ws-head {
+    font-size: clamp(15px, 4vw, 34px);
+    margin-top: 1px;
+    line-height: 1.2;
+    /* Keep whole words intact (only break a word that can't fit a line at all);
+       word-break:break-word was splitting normal words mid-letter. */
+    overflow-wrap: break-word;
+  }
+  .ws-meta {
+    font-size: clamp(15px, 4.2vw, 19px);
+    line-height: 1.3;
+    overflow-wrap: break-word;
+  }
+  .ws-body {
+    font-size: clamp(13.5px, 3vw, 15px);
+  }
+  /* Tighten bulleted/numbered lists so the points sit closer together. */
+  .ws-body li {
+    margin: 0;
+    line-height: 1.3;
+  }
+  .ws-body ul,
+  .ws-body ol {
+    margin: 0.3em 0;
+  }
+  /* --- PROJECT pages: the layout is flipped vs Education. Here the long line at
+     the top is the INTRO (.ws-hud-intro, the project summary) and the title is
+     short. So the badge-corner reserve moves to the intro (so it wraps clear of
+     Spotify), the heading's own reserve is dropped, and the heading is enlarged
+     to fill the freed space. --- */
+  .ws-hud-intro::before {
+    content: '';
+    float: right;
+    width: 72px; /* keep the intro's top line(s) clear of the logo */
+    height: 52px; /* tall enough to clear the full logo height */
+  }
+  .ws-page:has(.ws-hud-intro) > .ws-head::before {
+    content: none; /* no phantom reserve on the short title */
+  }
+  .ws-page:has(.ws-hud-intro) > .ws-head {
+    font-size: clamp(30px, 8vw, 48px);
+    line-height: 0.75;
+    margin-top: -13px;
+  }
+
+  /* Per-page tweak — "Coming Soon" ONLY: its title is long enough to slide under
+     Spotify, so give this one heading the badge-corner reserve back so it wraps
+     clear of the badge instead of running under it. */
+  .ws-page[data-entry='coming-soon'] > .ws-head::before {
+    content: '';
+    float: right;
+    width: 72px;
+    height: 50px;
+  }
+
+  /* Kind-level defaults. With Spotify now just a small logo, the badge reserve
+     is tiny (72px), so headings get nearly the full width — these can run big.
+     Education titles are longer (name + year), so their default is moderate;
+     short experience titles run large. Per-page overrides below fine-tune the
+     unusually long/short ones. */
+  .ws-page[data-kind='education'] > .ws-head {
+    font-size: clamp(22px, 6vw, 30px);
+    line-height: 1.12;
+  }
+  .ws-page[data-kind='experience'] > .ws-head {
+    font-size: clamp(30px, 9.5vw, 48px);
+    line-height: 1.05;
+  }
+
+  /* --- Per-page heading sizes: tuned individually so each title fills its space
+     and wraps on whole words (no mid-word breaks), all while clearing the logo.
+     The id is the kebab-case folder name. Tweak the middle vw value to taste. */
+
+  /* Education — longer titles get a smaller size so they wrap cleanly. */
+  .ws-page[data-entry='masters'] > .ws-head {
+    font-size: clamp(20px, 5.4vw, 27px);
+  }
+  .ws-page[data-entry='masters'] > .ws-meta {
+    font-size: clamp(13px, 3.7vw, 16.5px);
+    /* Render the \n in the meta as a real line break (before "(2025-2026)"). */
+    white-space: pre-line;
+  }
+  /* Smaller photo on this page to claw back some vertical space. */
+  .ws-page[data-entry='masters'] > .ws-figure {
+    width: min(190px, 58%);
+  }
+  .ws-page[data-entry='machine-learning'] > .ws-head {
+    font-size: clamp(20px, 5.4vw, 27px);
+  }
+  .ws-page[data-entry='school'] > .ws-head {
+    font-size: clamp(20px, 5.4vw, 27px);
+  }
+  .ws-page[data-entry='digital-marketing'] > .ws-head {
+    font-size: clamp(17px, 4.6vw, 23px);
+  }
+  .ws-page[data-entry='generative-ai'] > .ws-head {
+    font-size: clamp(17px, 4.6vw, 23px);
+  }
+
+  /* Experience — longer titles shrink from the big default so they fit whole. */
+  .ws-page[data-entry='mercor'] > .ws-head {
+    font-size: clamp(27px, 7.6vw, 38px);
+  }
+  .ws-page[data-entry='lingua-franca-institute'] > .ws-head {
+    font-size: clamp(24px, 7vw, 36px);
+  }
+
+  /* Skills / Hobbies boards: drop the intro label + heading entirely on mobile;
+     the categorised chips speak for themselves. */
+  .ws-page:has(.skills-board) > .ws-hud,
+  .ws-page:has(.skills-board) > .ws-head {
+    display: none;
+  }
+  .ws-page:has(.skills-board) .skills-board {
+    margin-top: 0;
+  }
+  /* Reserve the Spotify logo's corner so the first chip row wraps clear of it
+     (the heading that used to keep content below the logo is now gone). */
+  .ws-page:has(.skills-board) .skills-board::before {
+    content: '';
+    float: right;
+    width: 64px;
+    height: 50px;
+  }
+  /* Chips sized to fill the board down to just above the triangle (no scroll).
+     Nudge tech-tag font-size + skill-cat margin-bottom to fill more/less. */
+  .skills-board .tech-tag {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+  .skills-board .skill-cat {
+    margin-bottom: 14px;
+  }
+  .skills-board .skill-cat-head {
+    font-size: 14px;
+    margin-bottom: 7px;
+  }
+  .skills-board .skill-cat .tech-row {
+    gap: 7px;
+  }
+  /* Let the chips run closer to the triangle (less bottom dead space). */
+  .ws-scroll:has(.skills-board) {
+    padding-bottom: 90px;
+  }
+
+  /* --- Home (welcome) screen: must fit one screen with NO scrolling.
+     - Headings sit at the very TOP (the now-playing widget is compact enough to
+       sit beside the heading, top-right, without colliding).
+     - The intro block fills ALL the leftover height and spreads its paragraphs
+       (space-between) so the text covers the screen and the last line lands
+       just above the cockpit triangle. --- */
+  .ws-scroll:has(.ws-home) {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* Top/side pads keep content well off the frame; bottom clears the triangle. */
+    padding: 22px 30px 86px;
+  }
+  /* The page wrapper sits between .ws-scroll and .ws-home — it must fill and be
+     a flex column too, or the flex:1 chain that stretches the text breaks. */
+  .ws-scroll:has(.ws-home) .ws-page {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .ws-home {
+    flex: 1;
+    justify-content: flex-start;
+    gap: 10px;
+    padding-top: 0;
+  }
+  /* "FLIGHT DECK" label — size + position (mobile only). */
+  .ws-home .ws-hud {
+    font-size: 13px;       /* bigger = larger text */
+    letter-spacing: 1.5px; /* space between letters */
+    margin-left: 0;        /* + moves it RIGHT */
+    margin-top: 10px;         /* + moves it DOWN */
+    margin-bottom: 0;      /* + adds gap below it (pushes heading down) */
+  }
+  .ws-home .ws-head {
+    font-size: clamp(23px, 4.8vw, 24px);
+    line-height: 1.1;
+    margin-top: 1px;
+  }
+  .ws-home-photo {
+    margin-top: 10px;
+    flex: none;
+    width: clamp(250px, 21vh, 148px);
+  }
+  /* Fill the remaining height and spread the paragraphs top-to-bottom; justify
+     each so both edges are flush and the text fills the full width. */
+  .ws-home-intro {
+    flex: 1;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    text-align: left;
+    font-size: clamp(16px, 4vw, 10px);
+    line-height: 1.45;
+  }
+  .ws-home-intro p {
+    margin: 0;
+  }
+  .ws-travel {
+    font-size: 12px;
+    padding: 6px 13px;
+    bottom: 9px;
+  }
+}
+
+/* Now-playing popup expanding from the logo (top-right corner). */
+@keyframes np-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* White glow pulse for the cockpit's "back to windshield" triangle. */
+@keyframes back-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7))
+      drop-shadow(0 0 7px rgba(255, 255, 255, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1))
+      drop-shadow(0 0 17px rgba(255, 255, 255, 0.85));
+  }
+}
+
+/* Glow pulse for the cockpit-summon triangle. */
+@keyframes enter-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px rgba(255, 90, 90, 0.6))
+      drop-shadow(0 0 6px rgba(255, 60, 60, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 7px rgba(255, 120, 120, 1))
+      drop-shadow(0 0 16px rgba(255, 60, 60, 0.8));
   }
 }
 

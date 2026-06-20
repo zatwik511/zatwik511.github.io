@@ -66,17 +66,20 @@ function HullArt() {
         <rect key={`rs${y}`} x="98.4%" y={`${y}%`} width="6" height="6" />
       ))}
 
-      {/* nested corner brackets */}
-      {/* top-left */}
-      <line x1="2%" y1="3%" x2="2%" y2="12%" />
-      <line x1="2%" y1="3%" x2="9%" y2="3%" />
-      <line x1="4.2%" y1="5.2%" x2="4.2%" y2="8.5%" />
-      <line x1="4.2%" y1="5.2%" x2="7%" y2="5.2%" />
-      {/* top-right */}
-      <line x1="98%" y1="3%" x2="98%" y2="12%" />
-      <line x1="98%" y1="3%" x2="91%" y2="3%" />
-      <line x1="95.8%" y1="5.2%" x2="95.8%" y2="8.5%" />
-      <line x1="95.8%" y1="5.2%" x2="93%" y2="5.2%" />
+      {/* nested corner brackets. The TOP pair is wrapped so it can be removed on
+          mobile (where it sits awkwardly beside the name — see .decor-top-corners). */}
+      <g className="decor-top-corners">
+        {/* top-left */}
+        <line x1="2%" y1="3%" x2="2%" y2="12%" />
+        <line x1="2%" y1="3%" x2="9%" y2="3%" />
+        <line x1="4.2%" y1="5.2%" x2="4.2%" y2="8.5%" />
+        <line x1="4.2%" y1="5.2%" x2="7%" y2="5.2%" />
+        {/* top-right */}
+        <line x1="98%" y1="3%" x2="98%" y2="12%" />
+        <line x1="98%" y1="3%" x2="91%" y2="3%" />
+        <line x1="95.8%" y1="5.2%" x2="95.8%" y2="8.5%" />
+        <line x1="95.8%" y1="5.2%" x2="93%" y2="5.2%" />
+      </g>
       {/* bottom-left */}
       <line x1="2%" y1="97%" x2="2%" y2="88%" />
       <line x1="2%" y1="97%" x2="9%" y2="97%" />
@@ -88,23 +91,31 @@ function HullArt() {
       <line x1="95.8%" y1="94.8%" x2="95.8%" y2="91.5%" />
       <line x1="95.8%" y1="94.8%" x2="93%" y2="94.8%" />
 
-      {/* clusters in the pockets below the triangles (beside the tagline) */}
-      {/* left */}
-      <line x1="11%" y1="21.5%" x2="28%" y2="21.5%" />
-      <line x1="28%" y1="21.5%" x2="32%" y2="25.5%" />
-      <circle cx="32%" cy="25.5%" r="2.6" />
-      <line x1="11%" y1="21.5%" x2="11%" y2="27%" />
-      <circle cx="11%" cy="27%" r="1.8" />
-      <line x1="14%" y1="24%" x2="20%" y2="24%" />
-      <rect x="22%" y="19.5%" width="7" height="7" />
-      {/* right (mirror) */}
-      <line x1="89%" y1="21.5%" x2="72%" y2="21.5%" />
-      <line x1="72%" y1="21.5%" x2="68%" y2="25.5%" />
-      <circle cx="68%" cy="25.5%" r="2.6" />
-      <line x1="89%" y1="21.5%" x2="89%" y2="27%" />
-      <circle cx="89%" cy="27%" r="1.8" />
-      <line x1="80%" y1="24%" x2="86%" y2="24%" />
-      <rect x="71%" y="19.5%" width="7" height="7" />
+      {/* clusters in the pockets below the triangles (beside the tagline). These
+          frame the DESKTOP Skills/Hobbies position; on mobile the layout differs
+          so they're hidden (see .decor-pockets in the mobile CSS). */}
+      <g className="decor-pockets">
+        {/* left — its own group so it can be pushed toward the left border. */}
+        <g className="decor-pocket-l">
+          <line x1="11%" y1="21.5%" x2="28%" y2="21.5%" />
+          <line x1="28%" y1="21.5%" x2="32%" y2="25.5%" />
+          <circle cx="32%" cy="25.5%" r="2.6" />
+          <line x1="11%" y1="21.5%" x2="11%" y2="27%" />
+          <circle cx="11%" cy="27%" r="1.8" />
+          <line x1="14%" y1="24%" x2="20%" y2="24%" />
+          <rect className="decor-pocket-sq" x="22%" y="19.5%" width="7" height="7" />
+        </g>
+        {/* right (mirror) — pushed toward the right border. */}
+        <g className="decor-pocket-r">
+          <line x1="89%" y1="21.5%" x2="72%" y2="21.5%" />
+          <line x1="72%" y1="21.5%" x2="68%" y2="25.5%" />
+          <circle cx="68%" cy="25.5%" r="2.6" />
+          <line x1="89%" y1="21.5%" x2="89%" y2="27%" />
+          <circle cx="89%" cy="27%" r="1.8" />
+          <line x1="80%" y1="24%" x2="86%" y2="24%" />
+          <rect className="decor-pocket-sq" x="71%" y="19.5%" width="7" height="7" />
+        </g>
+      </g>
     </>
   )
 }

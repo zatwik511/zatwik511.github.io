@@ -2,8 +2,8 @@
 order: 1
 navLabel: School
 navBlurb: PCM & CS - Delhi Public School  
-title: "Delhi Public School Allahabad/Prayagraj (2006-2019)"
-meta: Physics + Chemistry + Maths + CS
+title: "Delhi Public School Prayagraj"    
+meta: Physics + Chemistry + Maths + CS (2006-2019)
 galaxy: Education
 link: Visit Website | https://dpsallahabad.com/
 ---

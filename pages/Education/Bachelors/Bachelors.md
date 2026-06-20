@@ -2,8 +2,8 @@
 order: 2
 navLabel: Bachelor's
 navBlurb: B.Tech CSE - Chandigarh University
-title: "Chandigarh University (2019-2023)"
-meta: B. Tech Computer Science Engineering 
+title: "Chandigarh University"
+meta: B. Tech Computer Science Engineering (2019-2023)
 galaxy: Education
 link: Visit Website | https://www.cuchd.in/
 ---

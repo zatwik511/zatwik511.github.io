@@ -40,6 +40,11 @@ function coerce(raw: string): string | number | boolean {
   if (v === 'true') return true
   if (v === 'false') return false
   if (/^-?\d+(\.\d+)?$/.test(v)) return Number(v)
+  // Double-quoted strings support \n (and \t) escapes, like YAML — handy for
+  // forcing a line break inside a value (e.g. a two-line meta).
+  if (v.length >= 2 && v[0] === '"' && v[v.length - 1] === '"') {
+    return v.slice(1, -1).replace(/\\n/g, '\n').replace(/\\t/g, '\t')
+  }
   return unquote(v)
 }
 

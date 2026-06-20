@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { IconBrandSpotify } from '@tabler/icons-react'
 import type { Preview } from '../App'
 import type { Entry, NowPlaying as NowPlayingData, SkillGroup } from '../content'
 import { LaunchButton } from './LaunchButton'
@@ -21,6 +22,8 @@ interface WindshieldProps {
   /** Transient label preview shown while a cockpit button is hovered/focused. */
   preview: Preview | null
   onLaunch?: () => void
+  /** MOBILE ONLY: summon the cockpit panel (glowing cue tap). */
+  onOpenCockpit?: () => void
 }
 
 /** Gap between triangles along the border (≈ their length, so tips touch). */
@@ -49,15 +52,26 @@ export function Windshield({
   pulse,
   preview,
   onLaunch,
+  onOpenCockpit,
 }: WindshieldProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const rafRef = useRef(0)
   const comingTimer = useRef(0)
+  const litTimer = useRef(0)
+  const openTimer = useRef(0)
   // How many triangles fit around the border (recomputed from the panel size).
   const [count, setCount] = useState(1)
   // Brief "COMING SOON !" popup shown when Launch 3D is clicked.
   const [coming, setComing] = useState(false)
+  // MOBILE: tapping Launch 3D floods the triangle border red briefly (the
+  // hover-flood from desktop, made tap-driven). Harmless on desktop — the CSS
+  // that reads `.launch-lit` lives in the mobile media query.
+  const [lit, setLit] = useState(false)
+  // MOBILE: the now-playing corner collapses to just the Spotify logo; tapping
+  // it expands the full widget as a popup (tapping elsewhere collapses it).
+  // Ignored on desktop, where the widget is always shown (logo hidden via CSS).
+  const [npOpen, setNpOpen] = useState(false)
   // The preview kept mounted locally so it can crossfade in and out (the prop
   // clears instantly on click/leave). `ov` is the overlay's opacity target and
   // the transition duration to reach it.
@@ -170,16 +184,34 @@ export function Windshield({
       clearTimeout(comingTimer.current)
       clearTimeout(exitTimer.current)
       clearTimeout(leaveTimer.current)
+      clearTimeout(litTimer.current)
+      clearTimeout(openTimer.current)
     },
     [],
   )
 
-  // Launch 3D isn't built yet — flash a "COMING SOON !" popup.
+  // Launch 3D isn't built yet — flash a "COMING SOON !" popup. On mobile this
+  // also floods the triangle border red for a beat (the desktop hover effect,
+  // made tap-driven).
   const showComingSoon = () => {
     onLaunch?.()
     setComing(true)
     window.clearTimeout(comingTimer.current)
     comingTimer.current = window.setTimeout(() => setComing(false), 1800)
+    setLit(true)
+    window.clearTimeout(litTimer.current)
+    litTimer.current = window.setTimeout(() => setLit(false), 750)
+  }
+
+  // MOBILE: the glowing triangle below the launch area. Tapping it flashes the
+  // triangle border (like clicking Launch 3D on PC), then summons the cockpit a
+  // beat later so the flash is visible before the crossfade.
+  const enterCockpit = () => {
+    setLit(true)
+    window.clearTimeout(litTimer.current)
+    litTimer.current = window.setTimeout(() => setLit(false), 800)
+    window.clearTimeout(openTimer.current)
+    openTimer.current = window.setTimeout(() => onOpenCockpit?.(), 300)
   }
 
   // Track the cursor (throttled to one frame): drives the star flare and the
@@ -207,7 +239,7 @@ export function Windshield({
 
   return (
     <section
-      className="windshield"
+      className={lit ? 'windshield launch-lit' : 'windshield'}
       aria-label="Flight deck display"
       ref={sectionRef}
       onMouseMove={moveCursor}
@@ -234,7 +266,27 @@ export function Windshield({
       <div className="ws-rule" aria-hidden="true" />
       <div className="ws-rule ws-rule-glow" aria-hidden="true" />
 
-      <div className="ws-np-corner">
+      {/* MOBILE: a full-screen catcher behind the open popup — tapping anywhere
+          off the widget collapses it back to the logo. */}
+      {npOpen && (
+        <div
+          className="np-backdrop"
+          onClick={() => setNpOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <div className={npOpen ? 'ws-np-corner np-open' : 'ws-np-corner'}>
+        {/* MOBILE-ONLY collapsed state: just the Spotify logo (hidden on
+            desktop, where the full widget always shows). */}
+        <button
+          type="button"
+          className="np-logo"
+          onClick={() => setNpOpen((o) => !o)}
+          aria-label="Show what's playing"
+          aria-expanded={npOpen}
+        >
+          <IconBrandSpotify size={30} stroke={1.7} aria-hidden="true" />
+        </button>
         <NowPlaying {...nowPlaying} />
       </div>
 
@@ -244,8 +296,15 @@ export function Windshield({
         {!(selected === null && !showSkills && !showHobbies) && (
           <div className="ws-widget-spacer" aria-hidden="true" />
         )}
-        {/* key={pulse} remounts on each click so the warp-in transition replays. */}
-        <div className="ws-page" key={pulse}>
+        {/* key={pulse} remounts on each click so the warp-in transition replays.
+            data-entry / data-kind expose the current page for per-page and
+            per-kind CSS tweaks. */}
+        <div
+          className="ws-page"
+          key={pulse}
+          data-entry={selected?.id}
+          data-kind={selected?.kind}
+        >
           {showSkills ? (
             <SkillsBoard groups={skillGroups} />
           ) : showHobbies ? (
@@ -278,6 +337,18 @@ export function Windshield({
       <div className="ws-launch-bar">
         <LaunchButton onLaunch={showComingSoon} />
       </div>
+
+      {/* MOBILE ONLY: a glowing, downward-pointing triangle (the Launch 3D
+          triangle, flipped) that summons the cockpit. No label — it just
+          pulses, waiting for a tap. Hidden on desktop, where both panels show. */}
+      <button
+        type="button"
+        className="ws-enter"
+        onClick={enterCockpit}
+        aria-label="Open the cockpit controls"
+      >
+        <span className="ws-enter-tri" aria-hidden="true" />
+      </button>
 
       {coming && (
         <div className="ws-toast" role="status">

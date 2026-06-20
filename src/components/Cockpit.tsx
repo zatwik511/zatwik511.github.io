@@ -87,6 +87,8 @@ interface CockpitProps {
   onPreview: (p: Preview) => void
   /** Clear the hover preview (button leave/blur). */
   onPreviewEnd: () => void
+  /** MOBILE ONLY: dismiss the cockpit and return to the windshield. */
+  onCloseCockpit?: () => void
 }
 
 const PAGE_SIZE = 3
@@ -211,6 +213,7 @@ export function Cockpit({
   onHome,
   onPreview,
   onPreviewEnd,
+  onCloseCockpit,
 }: CockpitProps) {
   const [emailOpen, setEmailOpen] = useState(false)
   const homeActive = selectedId === null && !skillsActive && !hobbiesActive
@@ -220,6 +223,18 @@ export function Cockpit({
       <HullDecor />
       {/* Boot-up: the touch-display screen powering on. */}
       <div className="cp-screen" aria-hidden="true" />
+
+      {/* MOBILE ONLY: a white glowing triangle pointing UP — back to the
+          windshield display. Mirrors the red down-triangle in the windshield
+          that opens the cockpit. (Hidden on desktop, where both panels show.) */}
+      <button
+        type="button"
+        className="cp-back"
+        onClick={onCloseCockpit}
+        aria-label="Back to the display"
+      >
+        <span className="cp-back-tri" aria-hidden="true" />
+      </button>
       <div className="cp-header">
         <div className="cp-name-row">
           <button

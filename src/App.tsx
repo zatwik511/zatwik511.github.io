@@ -26,6 +26,11 @@ export function App() {
   const [preview, setPreview] = useState<Preview | null>(null)
   // True during the boot-up intro (cockpit powers on, then the windshield).
   const [booting, setBooting] = useState(true)
+  // MOBILE ONLY: which panel is on screen. Desktop shows both side by side and
+  // ignores this entirely (the CSS that reads it lives in the mobile media
+  // query). The windshield is home base; a glowing cue summons the cockpit,
+  // and tapping a cockpit control crossfades back to the windshield.
+  const [mobilePanel, setMobilePanel] = useState<'windshield' | 'cockpit'>('windshield')
   useEffect(() => {
     const t = window.setTimeout(() => setBooting(false), 4000)
     return () => window.clearTimeout(t)
@@ -36,6 +41,9 @@ export function App() {
     // Drop the hover preview so the freshly fetched page (and its warp-in)
     // shows immediately, even while the cursor is still on the button.
     setPreview(null)
+    // On mobile, a cockpit control crossfades back to the windshield to reveal
+    // the content it loaded. (No-op on desktop — both panels are always shown.)
+    setMobilePanel('windshield')
   }
 
   // Resolved fresh every render (not memoised) so editing a page's markdown
@@ -56,8 +64,16 @@ export function App() {
     // TODO(phase-3): navigate to the 3D ride (mode `x`).
   }
 
+  const deckClass = [
+    'deck',
+    booting ? 'booting' : '',
+    `panel-${mobilePanel}`,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <main className={booting ? 'deck booting' : 'deck'}>
+    <main className={deckClass}>
       <CursorTrail />
       <Windshield
         nowPlaying={nowPlaying}
@@ -69,6 +85,7 @@ export function App() {
         pulse={pulse}
         preview={preview}
         onLaunch={handleLaunch}
+        onOpenCockpit={() => setMobilePanel('cockpit')}
       />
       <Cockpit
         profile={profile}
@@ -81,6 +98,7 @@ export function App() {
         onHome={() => show({ kind: 'home' })}
         onPreview={setPreview}
         onPreviewEnd={() => setPreview(null)}
+        onCloseCockpit={() => setMobilePanel('windshield')}
       />
     </main>
   )
